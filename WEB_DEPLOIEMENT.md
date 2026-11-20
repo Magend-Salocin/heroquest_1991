@@ -27,6 +27,18 @@ node outils/paquet.mjs
 5. Envoyer `paquet/heroquest-donnees.bin` sur le téléphone (iCloud Drive, AirDrop, câble).
 6. Sur le téléphone : ouvrir le site dans Safari, Partager > « Sur l'écran d'accueil », puis lancer depuis l'icône et choisir le paquet. Faire l'import depuis l'icône, pas depuis Safari : les deux ont des données séparées.
 
+## Version PC (Electron)
+
+Comme Bestiora Azur, le jeu tourne aussi dans une fenêtre Electron, sans PHP : `electron/main.js` sert `web/` par un protocole `app://` qui remplace `fichiers.php` (fichiers lus dans `jeu/`, sauvegardes dans `%APPDATA%/heroquest-1991/sauvegardes/`).
+
+| Besoin | Commande (depuis la racine) |
+| --- | --- |
+| Installer (une fois) | `npm install` |
+| Jouer | `npm start` (`npm run dev` avec les outils de développement) |
+| Fabriquer le `.exe` portable | `npm run dist` -> `dist/HeroQuest 1991-1.0.0-portable.exe` |
+
+Le `.exe` contient le jeu d'origine : usage personnel, jamais publié ni partagé (`dist/` est ignoré par git). `npm start` passe par `outils/lancer-electron.mjs`, qui retire `ELECTRON_RUN_AS_NODE` hérité des terminaux de VS Code.
+
 ## Au quotidien
 
 | Besoin | Commande ou action |

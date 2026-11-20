@@ -27,7 +27,7 @@ Ordre proposé, du socle vers le jeu :
 3. **Règles** : tour de jeu (héros puis Morcar), déplacement, révélation des pièces et des couloirs, combat, intelligence des monstres, pièges, fouille, portes secrètes, sorts, cartes trésor, objets, événements scriptés par zone (quêtes 5 et 10 comprises).
 4. **Textes** : table d'index des messages de `FRENCH.BIN`, pour relier chaque numéro de message à son appel dans le code.
 
-Méthode : lire le listing, poser des noms dans `symboles.txt`, régénérer. Vérifier les hypothèses sur l'original qui tourne, avec le débogueur de DOSBox-X (installé, voir [DEBOGUER.md](outils/DEBOGUER.md)) : points d'arrêt, lecture du segment de données.
+Méthode : lire le listing, poser des noms dans `symboles.txt`, régénérer. Vérifier les hypothèses sur l'original qui tourne, avec le débogueur de DOSBox-X (outils retirés le 20 novembre 2026, dans l'historique git) : points d'arrêt, lecture du segment de données.
 
 Bogues vérifiés dans le code le 27 octobre (ligne de vue vers le haut, mur manqué et blocage des tirs, cache des meubles, `monstre_actif_case`, joystick B, chemin des monstres) : voir les notes. Les hypothèses (?) de `symboles.txt` ont toutes été relues le 27 octobre : il n'en reste aucune. La phase 1 est terminée le 18 novembre 2026 : les 4 sauts indirects de QUEST sont résolus (`SAUTS_INDIRECTS` de `desassembler.py`), et les 91 routines d'INTRO.EXE sont nommées et décrites ([04-intro.md](original/notes/04-intro.md)).
 

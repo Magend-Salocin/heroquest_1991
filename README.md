@@ -14,12 +14,12 @@ Projet personnel, non commercial. Le dépôt est public : les données de Gremli
 | `docs/FORMATS.md` | formats des fichiers du jeu (compressions, palette, sprites, quêtes, sauvegarde) | oui |
 | `original/symboles.txt` | noms des routines, variables et tables de QUEST.EXE, à enrichir au fil de l'étude ; `symboles-intro.txt` pour INTRO.EXE | oui |
 | `original/notes/` | ce que fait le code, par sous-système | oui |
-| `original/binaires/` | QUEST.EXE et INTRO.EXE décompressés (image mémoire) | non, généré |
-| `original/asm/` | désassemblage annoté (`quest.asm`, `intro.asm`), segment de données (`*-donnees.txt`), couverture (`*-rapport.txt`), résumé des routines (`*-routines.txt`) | non, généré |
+| `original/binaires/` | QUEST.EXE et INTRO.EXE décompressés, recréés par `desassembler.py` au besoin | non, généré |
+| `original/asm/` | désassemblage annoté (`quest.asm`, `intro.asm`), segment de données (`*-donnees.txt`), couverture (`*-rapport.txt`), résumé des routines (`*-routines.txt`), recréé par `desassembler.py` au besoin (lecture du code pour la réécriture lisible) | non, généré |
 | `original/donnees/` | palettes, écrans, sprites et images, textes des 5 langues, quêtes en JSON, morceaux de musique | non, généré |
-| `outils/` | `desassembler.py`, `extraire.py`, `ecran.py` (images dessinées et messages affichés par une routine), le lancement du jeu original sous DOSBox-X avec débogueur ([DEBOGUER.md](outils/DEBOGUER.md)), et pour le portage `recompiler.py`, `difference.py`, `essai.mjs`, `navigateur.mjs`, `lisible.mjs` ([web/README.md](web/README.md#vérifier)) | oui |
+| `outils/` | régénération (`desassembler.py`, `recompiler.py`, `extraire.py`, `adresses.py`, `son.py`, `sons.mjs`), vérification du code lisible (`lisible.mjs`, `essai.mjs`, `navigateur.mjs`), publication (`construire-site.mjs`, `paquet.mjs`), lancement d'Electron (`lancer-electron.mjs`) | oui |
 | `outils/heroquest/` | décompresseurs EXEPACK et LZ, outil d'exploration, copiés de `donjon-v2/bin/` | oui |
-| `travail/` | copie du jeu utilisée par DOSBox-X (sauvegardes, journal) | non |
+| `electron/`, `package.json` | version PC : `npm start`, `.exe` portable par `npm run dist` (dans `dist/`, usage personnel) | oui |
 | `web/` | le portage JavaScript et PHP : [web/README.md](web/README.md) ; `jeu/*.gen.js` et `sons/` sont générés | en partie |
 | `WEB_DEPLOIEMENT.md` | publication sur GitHub Pages et jeu sur téléphone (paquet de données, tactile, hors ligne) | oui |
 | `.github/workflows/pages.yml` | déploie `web/` (moteur seul) sur GitHub Pages | oui |
@@ -27,7 +27,7 @@ Projet personnel, non commercial. Le dépôt est public : les données de Gremli
 
 ## Installer
 
-Prérequis : Python 3.10+, `pip install pillow capstone unicorn`, Node 22+, PHP 8 (pour servir la page).
+Prérequis : Python 3.10+, `pip install pillow capstone unicorn`, Node 22+ ; PHP 8 pour servir la page dans un navigateur, ou `npm install` pour Electron.
 
 1. Copier les fichiers du jeu d'origine dans `jeu/`.
 2. Régénérer, depuis `outils/` :
@@ -39,7 +39,12 @@ Prérequis : Python 3.10+, `pip install pillow capstone unicorn`, Node 22+, PHP 
    python son.py && node sons.mjs                                 # web/sons/*.wav
    ```
 
-3. Lancer la page : `php -S 127.0.0.1:8765 -t web` depuis la racine, puis `http://127.0.0.1:8765/`.
+3. Jouer, depuis la racine :
+   - sur PC dans une fenêtre : `npm install` (une fois), puis `npm start` ; `npm run dist` fabrique `dist/HeroQuest 1991-1.0.0-portable.exe` ;
+   - dans un navigateur : `php -S 127.0.0.1:8765 -t web`, puis `http://127.0.0.1:8765/` ;
+   - sur téléphone : voir [WEB_DEPLOIEMENT.md](WEB_DEPLOIEMENT.md).
+
+Le 20 novembre 2026, les outils d'étude du jeu original (DOSBox-X et son débogueur, test différentiel `difference.py`, `ecran.py`) ont été retirés : ils restent dans l'historique git (commit `df54dd0`).
 
 ## Régénérer
 

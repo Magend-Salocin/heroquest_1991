@@ -1,0 +1,45 @@
+{
+  "name": "heroquest-1991",
+  "productName": "HeroQuest 1991",
+  "version": "1.0.0",
+  "description": "Portage navigateur et PC du HeroQuest PC de 1991, à partir du code original. Usage personnel.",
+  "private": true,
+  "type": "module",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node outils/lancer-electron.mjs",
+    "dev": "node outils/lancer-electron.mjs --dev",
+    "dist": "electron-builder",
+    "web": "php -S 127.0.0.1:8765 -t web",
+    "site": "node outils/construire-site.mjs",
+    "paquet": "node outils/paquet.mjs"
+  },
+  "devDependencies": {
+    "electron": "45.3.1",
+    "electron-builder": "^26.18.0"
+  },
+  "allowScripts": {
+    "electron@45.3.1": true
+  },
+  "build": {
+    "appId": "fr.magend.heroquest1991",
+    "productName": "HeroQuest 1991",
+    "directories": { "output": "dist" },
+    "files": [
+      "package.json",
+      "electron/**/*",
+      "web/**/*",
+      "!web/fichiers.php",
+      "!web/sauvegardes/**",
+      "!web/README.md"
+    ],
+    "extraResources": [
+      { "from": "jeu", "to": "jeu", "filter": ["**/*", "!*.EGA", "!*.PIF", "!*.md", "!TANDY.DRV", "!MT32.DRV"] }
+    ],
+    "win": {
+      "target": ["portable"],
+      "icon": "web/icones/icone-512.png"
+    },
+    "portable": { "artifactName": "${productName}-${version}-portable.${ext}" }
+  }
+}

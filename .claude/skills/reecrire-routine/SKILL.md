@@ -9,7 +9,7 @@ Argument : un nom de routine de `original/symboles.txt` (par exemple `attaque_he
 
 ## Étapes
 
-1. Lire la routine dans `original/asm/quest.asm` (chercher son nom), son résumé dans `original/asm/quest-routines.txt` (appelants, variables, interruptions) et la note du sous-système dans `original/notes/`.
+1. Si `original/asm/` manque, le recréer : `python desassembler.py QUEST` depuis `outils/`. Lire la routine dans `original/asm/quest.asm` (chercher son nom), son résumé dans `original/asm/quest-routines.txt` (appelants, variables, interruptions) et la note du sous-système dans `original/notes/`.
 2. Relever :
    - les registres d'entrée, et ceux que les appelants lisent au retour (champ `sortie`) ;
    - les variables du segment de données lues et écrites ;

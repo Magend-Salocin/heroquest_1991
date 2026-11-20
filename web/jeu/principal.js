@@ -262,10 +262,9 @@ function configuration(enregistree) {
 }
 
 // Mode hors ligne du site publié : le service worker garde les fichiers du site en cache.
-// Pas en local (le cache masquerait les modifications), ni hors contexte sécurisé.
+// Seulement en HTTPS : ni en local (le cache masquerait les modifications), ni dans Electron (app://).
 function enregistrerHorsLigne() {
-  const local = ['localhost', '127.0.0.1'].includes(location.hostname);
-  if (!local && window.isSecureContext && 'serviceWorker' in navigator) {
+  if (location.protocol === 'https:' && 'serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch((e) => console.warn('mode hors ligne indisponible', e));
   }
 }

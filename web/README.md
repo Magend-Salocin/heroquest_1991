@@ -48,7 +48,7 @@ Son : comme dans l'original, la musique joue au départ (dès l'intro) et les ef
 
 - Les segments relogés par DOS (table EXEPACK) deviennent `valeur + m.L`.
 - Les octets de code que le programme réécrit (code automodifié, par exemple 0x26C9) sont relus en mémoire à chaque passage ; une écriture dans un autre octet du code traduit est signalée dans la console.
-- Le temps est compté en instructions, 3000 par milliseconde, comme `cycles = fixed 3000` dans `outils/dosbox-x.conf` : attentes, animations et retour de trame (70 Hz) durent comme sous DOSBox-X.
+- Le temps est compté en instructions, 3000 par milliseconde, comme `cycles = fixed 3000` sous DOSBox-X : attentes, animations et retour de trame (70 Hz) durent comme sous DOSBox-X.
 
 Le résultat est identique à l'original par construction : même mémoire, mêmes adresses, même générateur de hasard. On peut ensuite réécrire une routine à la main en gardant la version générée comme référence.
 
@@ -83,7 +83,7 @@ Deux sortes de routines :
 
 Le temps du jeu avance du nombre moyen d'instructions de la version générée (champ `cout`), à quelques instructions près selon le chemin suivi : le rythme reste celui de l'original, pas au cycle près.
 
-Pour réécrire une routine : lire son listing dans `original/asm/quest.asm`, écrire la méthode dans le module du sous-système, l'ajouter à `routines.js`, puis la comparer.
+Pour réécrire une routine : lire son listing dans `original/asm/quest.asm` (`python desassembler.py QUEST` s'il manque), écrire la méthode dans le module du sous-système, l'ajouter à `routines.js`, puis la comparer.
 
 Vérifier, depuis `outils/` :
 
@@ -120,13 +120,12 @@ Depuis `outils/` (prérequis : `pip install capstone unicorn`, Node 22 ou plus) 
 
 ```bash
 python recompiler.py QUEST        # puis INTRO : régénère jeu/*.gen.js
-python difference.py 10 QUEST     # chaque instruction traduite contre un vrai x86 (Unicorn), 10 états au hasard ; puis INTRO
 node essai.mjs 5 menu.png "clic:68:128,attendre:3,clic:160:44,attendre:4"   # le jeu sans navigateur
 PROGRAMME=INTRO node essai.mjs 15 intro.png "espace,attendre:8"             # l'intro
 node navigateur.mjs "http://127.0.0.1:8765/?sans-intro&debug" page.png "attendre:5,clic:163:130"  # dans Chrome
 ```
 
-`difference.py` compare registres, drapeaux définis, octets écrits et instruction suivante ; il exclut les interruptions, les ports et l'appel du pilote de son, qui dépendent de l'environnement. Résultat au 18 novembre 2026 : QUEST 146 660 cas, INTRO 67 400 cas, 0 écart.
+Le test différentiel de chaque instruction traduite contre un vrai x86 (`difference.py`, retiré le 20 novembre 2026, dans l'historique git) donnait au 18 novembre 2026 : QUEST 146 660 cas, INTRO 67 400 cas, 0 écart.
 
 ## Limites
 
