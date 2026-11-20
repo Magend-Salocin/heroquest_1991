@@ -1,6 +1,6 @@
 # Portage web
 
-HeroQuest PC (Gremlin, 1991) dans un navigateur, à partir du code original traduit en JavaScript. Les fichiers du jeu ne sont pas copiés ici : `fichiers.php` les lit dans `../jeu/`.
+HeroQuest PC (Gremlin, 1991) dans un navigateur, à partir du code original traduit en JavaScript. Les fichiers du jeu ne sont pas copiés ici : en local, `fichiers.php` les lit dans `../jeu/` ; sur le site publié (GitHub Pages, téléphone), ils arrivent par un paquet de données importé sur l'appareil ([WEB_DEPLOIEMENT.md](../WEB_DEPLOIEMENT.md)).
 
 ## Lancer
 
@@ -18,6 +18,8 @@ Un seul affichage, le VGA, et un seul son, l'AdLib. La page fournit `QUEST.CFG` 
 | `index.html?langue=en` | langue des textes : `fr` (par défaut), `en`, `es`, `de`, `it` |
 | `index.html?genere` | code généré seul, sans les routines réécrites de `jeu/lisible/` (pour comparer) |
 | `index.html?debug` | affiche sous l'écran le programme, le temps de jeu et l'IP ; expose `window.jeu` (son, machine) |
+| `index.html?paquet`, `?paquet=URL`, `?importer` | ignore le serveur PHP et utilise le paquet de l'appareil ; l'importe depuis une adresse ; propose d'en importer un autre |
+| `index.html?tactile`, `?sans-tactile` | force ou masque les commandes tactiles (affichées d'office sur un écran tactile) |
 
 Le jeu dessine son propre curseur. Clavier : positions physiques du PC (voir `jeu/clavier.js`) ; Ctrl quitte.
 
@@ -30,10 +32,13 @@ Son : comme dans l'original, la musique joue au départ (dès l'intro) et les ef
 | `jeu/quest.gen.js`, `jeu/intro.gen.js` | code traduit, généré par `outils/recompiler.py` : une fonction par routine, au nom de `original/symboles.txt` (ou `symboles-intro.txt`), chaque instruction d'origine en commentaire. Ne pas modifier à la main |
 | `jeu/machine.js` | ce que le code attend autour de lui : registres et drapeaux du 8086, mémoire de 1 Mo, pile, DOS (fichiers, mémoire, vecteurs), BIOS (vidéo, clavier, zone de données), VGA 13h, mode texte, souris, ports, IRQ clavier, temps |
 | `jeu/exepack.js` | décompression EXEPACK et relocations, comme DOS au chargement |
-| `jeu/principal.js` | la page : chargement des fichiers, boucle au rythme du temps réel, affichage, entrées |
+| `jeu/principal.js` | la page : source des fichiers (serveur PHP ou paquet), boucle au rythme du temps réel, affichage, entrées souris, tactiles et clavier |
+| `jeu/paquet.js`, `jeu/archive.js` | paquet de données du site publié (IndexedDB, sauvegardes) ; format d'archive commun avec `fichiers.php` |
+| `jeu/tactile.js` | commandes tactiles : clic droit, clavier de l'appareil, F10 |
+| `sw.js`, `manifest.webmanifest`, `icones/` | hors ligne et installation sur l'écran d'accueil (site publié) |
 | `jeu/lisible/` | le code réécrit à la main, lisible (voir « Code lisible ») |
 | `jeu/clavier.js` | codes clavier du PC |
-| `jeu/son.js` | joue les WAV de `sons/` quand le jeu appelle son pilote (int 60h : jouer, arrêter, silence) ; la musique en boucle |
+| `jeu/son.js` | joue les WAV (de `sons/` ou du paquet) quand le jeu appelle son pilote (int 60h : jouer, arrêter, silence) ; la musique en boucle |
 | `sons/` | les morceaux du pilote AdLib en WAV (mono, 16 bits, 22 050 Hz), générés (voir « Son »), ignorés par git |
 | `fichiers.php` | les fichiers d'origine en une archive, sans ceux des autres versions (`.EGA`, pilotes Tandy et MT-32) ; écrit `QUEST.SAV` et `QUEST.CFG` dans `sauvegardes/` (ignoré par git), jamais dans le jeu d'origine |
 

@@ -21,7 +21,9 @@ Projet personnel, non commercial. Le dépôt est public : les données de Gremli
 | `outils/heroquest/` | décompresseurs EXEPACK et LZ, outil d'exploration, copiés de `donjon-v2/bin/` | oui |
 | `travail/` | copie du jeu utilisée par DOSBox-X (sauvegardes, journal) | non |
 | `web/` | le portage JavaScript et PHP : [web/README.md](web/README.md) ; `jeu/*.gen.js` et `sons/` sont générés | en partie |
-| `WEB_DEPLOIEMENT.md` | recette de publication web (GitHub Pages, iPhone, clés) reprise de Bestiora Azur, pour plus tard | oui |
+| `WEB_DEPLOIEMENT.md` | publication sur GitHub Pages et jeu sur téléphone (paquet de données, tactile, hors ligne) | oui |
+| `.github/workflows/pages.yml` | déploie `web/` (moteur seul) sur GitHub Pages | oui |
+| `paquet/`, `_site/` | paquet de données pour le téléphone (`outils/paquet.mjs`), site construit (`outils/construire-site.mjs`) | non |
 
 ## Installer
 

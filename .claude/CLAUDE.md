@@ -19,7 +19,8 @@ jeu/*.EXE ──desassembler.py──> original/asm/quest.asm (+ symboles.txt po
           ──recompiler.py────> web/jeu/quest.gen.js, intro.gen.js (une fonction JS par routine)
 web/jeu/lisible/*.js : réécriture à la main, routine par routine, branchée à la place du code généré
 web/jeu/machine.js   : le PC autour du code (8086, mémoire 1 Mo, DOS, BIOS, VGA 13h, souris, clavier)
-web/fichiers.php     : sert les fichiers de jeu/ et garde les sauvegardes dans web/sauvegardes/
+web/fichiers.php     : sert les fichiers de jeu/ et garde les sauvegardes dans web/sauvegardes/ (local)
+web/jeu/paquet.js    : site publié (GitHub Pages) : jeu/, *.gen.js et sons dans un paquet importé sur l'appareil
 ```
 
 ## Règles
@@ -29,6 +30,7 @@ web/fichiers.php     : sert les fichiers de jeu/ et garde les sauvegardes dans w
 - Le code lisible doit reproduire l'original, bogues compris. Un bogue trouvé en route va dans `original/notes/bogues-reecriture.md`, il n'est pas corrigé.
 - Toute réécriture est vérifiée contre la version générée (`node lisible.mjs`) avant d'être considérée comme faite.
 - Adresses en hexadécimal minuscule dans le code (`0x3613`), positions dans l'image décompressée ; variables du segment de données notées `DS:3FD2`.
+- Le site publié (`outils/construire-site.mjs`, `.github/workflows/pages.yml`) ne contient que le moteur. Tout ce qui vient du jeu passe par le paquet (`outils/paquet.mjs`), jamais par `web/` versionné ni `_site/`. Détails : [WEB_DEPLOIEMENT.md](../WEB_DEPLOIEMENT.md).
 - Mettre à jour la doc concernée (web/README.md, ROADMAP.md, notes) dans le même changement que le code.
 
 ## Commandes
@@ -46,6 +48,8 @@ Toutes depuis `outils/`, sauf le serveur. Prérequis : Python 3.10+ (`pillow cap
 | Jeu sans navigateur, capture | `node essai.mjs 5 menu.png "clic:68:128,attendre:3"` |
 | Ce qu'une routine dessine et affiche | `python ecran.py 7717` (adresse en hexadécimal) |
 | Servir la page | `php -S 127.0.0.1:8765 -t web` depuis la racine |
+| Construire le site publié | `node construire-site.mjs` (-> `_site/`) |
+| Paquet de données pour le téléphone | `node paquet.mjs` (-> `paquet/heroquest-donnees.bin`) |
 | Jeu original sous DOSBox-X | `.\lancer-dosbox.ps1` (`-Debug`, `-Neuf`) |
 
 Sur Windows, la sortie console de Python est en cp1252 : les accents apparaissent mal dans le terminal, les fichiers écrits sont corrects.

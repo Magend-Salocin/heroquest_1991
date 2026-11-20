@@ -18,6 +18,10 @@
 # Sauvegardes du joueur servies par fichiers.php
 /web/sauvegardes/
 
+# Paquet de données pour l'appareil (outils/paquet.mjs) et site construit (outils/construire-site.mjs)
+/paquet/
+/_site/
+
 # Python, Node, système
 __pycache__/
 node_modules/

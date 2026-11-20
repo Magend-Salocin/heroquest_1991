@@ -1,11 +1,13 @@
 // Son du jeu : les morceaux du pilote AdLib, rendus une fois pour toutes en WAV (outils/sons.mjs,
-// dossier ../sons/). La machine appelle jouer, arreter et silence comme le jeu appelle son pilote.
+// dossier ../sons/ ou paquet de données). La machine appelle jouer, arreter et silence comme le jeu appelle son pilote.
 // Le morceau 0 est la musique, jouée en boucle ; les autres sont des effets.
 
 const MUSIQUE = 0;
 
 export class Son {
-  constructor() {
+  // lireMorceau(fichier) : promesse du contenu de 'morceauNN.wav' (ArrayBuffer), ou null.
+  constructor(lireMorceau) {
+    this.lireMorceau = lireMorceau;
     this.audio = null;
     this.tampons = new Map();         // morceau -> promesse d'AudioBuffer (null si pas de fichier)
     this.poignees = new Map();        // poignée du pilote -> { morceau, source }
@@ -26,9 +28,8 @@ export class Son {
 
   charger(morceau) {
     if (!this.tampons.has(morceau)) {
-      const nom = `sons/morceau${String(morceau).padStart(2, '0')}.wav`;
-      this.tampons.set(morceau, fetch(nom)
-        .then((r) => (r.ok ? r.arrayBuffer() : null))
+      const fichier = `morceau${String(morceau).padStart(2, '0')}.wav`;
+      this.tampons.set(morceau, this.lireMorceau(fichier)
         .then((octets) => (octets ? this.audio.decodeAudioData(octets) : null))
         .catch(() => null));
     }

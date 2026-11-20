@@ -2,26 +2,74 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="HeroQuest">
+  <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icones/icone-180.png">
+  <link rel="icon" href="icones/icone-180.png">
   <title>HeroQuest 1991</title>
   <style>
-    :root { --fond: #000; --texte: #ccc; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--fond); color: var(--texte); font: 14px sans-serif; }
+    :root { --fond: #000; --texte: #ccc; --bouton: #2a2a2a; --bouton-actif: #555; --bord: #666; }
+    body { margin: 0; min-height: 100vh; min-height: 100dvh; display: grid; place-items: center;
+           background: var(--fond); color: var(--texte); font: 14px sans-serif; }
     main { display: grid; gap: 8px; justify-items: center; }
     /* 320 x 200 affiché en 4/3, comme sur un écran VGA, sans lissage */
-    #ecran { width: min(96vw, 128vh); aspect-ratio: 4 / 3; image-rendering: pixelated; cursor: none; }
+    #ecran { width: min(96vw, 128vh); aspect-ratio: 4 / 3; image-rendering: pixelated; cursor: none; touch-action: none; }
     #etat { min-height: 1.2em; }
     /* mode texte (questions de configuration de l'intro) : 80 x 25 */
     #texte { margin: 0; width: min(96vw, 128vh); aspect-ratio: 4 / 3; box-sizing: border-box; padding: 2vh 2vw;
              background: #000; color: #aaa; font: clamp(8px, 1.9vh, 18px)/1.25 monospace; overflow: hidden; }
+    button { font: inherit; color: var(--texte); background: var(--bouton); border: 1px solid var(--bord);
+             border-radius: 8px; padding: 6px 12px; touch-action: manipulation; }
+    button:active { background: var(--bouton-actif); }
+    [hidden] { display: none !important; }
+
+    /* Import du paquet de données (site publié) */
+    #import { max-width: 34em; padding: 16px; line-height: 1.5; }
+    #import h1 { font-size: 1.3em; margin: 0 0 8px; }
+    #import code { color: #fff; }
+    #erreur-import { color: #f88; min-height: 1.5em; }
+
+    /* Commandes tactiles (tactile.js) */
+    #commandes { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    #commandes button { min-width: 72px; min-height: 48px; font-size: 16px; }
+    #saisie { position: fixed; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; font-size: 16px; border: 0; padding: 0; }
+    body.tactile { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+                   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+                   box-sizing: border-box; }
+    body.tactile #ecran, body.tactile #texte { width: min(100vw, calc((100dvh - 140px) * 4 / 3)); }
+    @media (orientation: landscape) {
+      body.tactile main { grid-template-columns: auto auto; align-items: center; }
+      body.tactile #ecran, body.tactile #texte { width: min(calc(100vw - 120px), calc((100dvh - 8px) * 4 / 3)); grid-column: 1; grid-row: 1 / span 3; }
+      body.tactile #commandes { flex-direction: column; }
+      body.tactile #etat:empty { display: none; }
+    }
   </style>
 </head>
 <body>
   <main>
+    <section id="import" hidden>
+      <h1>Paquet de données</h1>
+      <p>Ce site ne contient que le moteur du jeu. Les fichiers du jeu de 1991, le code traduit et les sons
+        viennent d'un paquet fabriqué sur le PC depuis votre copie du jeu (<code>node outils/paquet.mjs</code>).</p>
+      <p>Choisissez le fichier <code>heroquest-donnees.bin</code> : il est gardé sur cet appareil, et le jeu marche ensuite hors ligne.</p>
+      <input id="fichier-paquet" type="file">
+      <p id="erreur-import"></p>
+    </section>
     <canvas id="ecran" width="320" height="200"></canvas>
     <pre id="texte" hidden></pre>
+    <div id="commandes" hidden>
+      <button id="clic-droit" type="button">Clic droit</button>
+      <button id="clavier" type="button">Clavier</button>
+      <button id="son" type="button">Son (F10)</button>
+    </div>
     <div id="etat"></div>
     <button id="passer-intro" type="button" hidden>Passer l'intro (Échap)</button>
+    <input id="saisie" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" aria-label="Saisie au clavier">
   </main>
   <script type="module" src="jeu/principal.js"></script>
 </body>
