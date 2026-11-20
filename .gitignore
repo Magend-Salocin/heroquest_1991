@@ -1,0 +1,28 @@
+# Dépôt public : rien de Gremlin ou Hasbro n'est publié, ni les fichiers d'origine ni ce qui en est tiré.
+# Tout ce qui suit se régénère depuis jeu/ (voir README.md, « Installer »).
+
+# Fichiers du jeu de 1991
+/jeu/
+
+# Copie de travail pour DOSBox-X (sauvegardes, journal)
+/travail/
+
+# Extrait ou généré depuis les exécutables et les données d'origine
+/original/binaires/
+/original/asm/
+/original/donnees/
+/web/jeu/quest.gen.js
+/web/jeu/intro.gen.js
+/web/sons/
+
+# Sauvegardes du joueur servies par fichiers.php
+/web/sauvegardes/
+
+# Python, Node, système
+__pycache__/
+node_modules/
+Thumbs.db
+.DS_Store
+
+# Réglages locaux de Claude Code
+.claude/settings.local.json
