@@ -58,7 +58,7 @@ Une nouvelle version publiée est téléchargée au lancement suivant avec rése
 | `web/jeu/principal.js` | Choisit la source : le serveur PHP s'il répond (local), sinon le paquet de l'appareil, sinon l'écran d'import ; entrées souris, tactiles et clavier ; enregistre le service worker |
 | `web/jeu/paquet.js` | Import du paquet (gzip), vérification, stockage dans IndexedDB avec les sauvegardes ; charge le code traduit depuis le paquet (`import()` d'un blob) |
 | `web/jeu/archive.js` | Format d'archive commun à `fichiers.php` et au paquet |
-| `web/jeu/tactile.js` | Boutons Clic droit, Clavier (clavier de l'appareil pour le nom des héros), Son (F10) |
+| `web/jeu/tactile.js` | Boutons Clic droit, Clavier (clavier de l'appareil pour le nom des héros), Son (F10) ; vibration (gestes de l'écran dans `principal.js`) |
 | `web/sw.js` | Service worker : cache des fichiers du site, cache d'abord, suppression des anciennes versions |
 | `web/manifest.webmanifest`, `web/icones/` | Installation sur l'écran d'accueil (plein écran, icône) |
 | `outils/construire-site.mjs` | Construit `_site/` : `web/` sans `fichiers.php`, `sauvegardes/`, `sons/`, `*.gen.js` ; écrit `precache-manifest.js` (version = empreinte du contenu). Refuse de construire si un fichier du jeu d'origine s'y trouve |
@@ -67,12 +67,14 @@ Une nouvelle version publiée est téléchargée au lancement suivant avec rése
 
 ## Commandes tactiles
 
-Affichées sur un écran tactile (`pointer: coarse`), sous l'écran en portrait et à droite en paysage. Forcées par `?tactile`, masquées par `?sans-tactile`.
+Affichées sur un écran tactile (`pointer: coarse`) : sous l'écran en portrait, avec un rappel des gestes ; en paysage, Clic droit à gauche de l'écran (pouce gauche) et les autres boutons à droite, l'écran prenant toute la hauteur. Forcées par `?tactile`, masquées par `?sans-tactile`. L'application installée s'ouvre en paysage (`orientation` du manifeste) sur Android ; Safari sur iPhone ignore ce réglage. Un manifeste modifié n'est pris en compte qu'après réinstallation de l'icône.
 
 | Geste | Effet dans le jeu |
 | --- | --- |
-| Toucher l'écran | Le curseur va sous le doigt, puis clic gauche (appui tenu au moins 150 ms, car le jeu lit l'état des boutons sans mémoriser les clics) |
-| Glisser sur l'écran | Le curseur suit le doigt, le bouton reste appuyé |
+| Toucher l'écran | Le curseur va sous le doigt ; au relâchement, clic gauche (tenu au moins 150 ms, car le jeu lit l'état des boutons sans mémoriser les clics). Un tremblement de moins de 8 px ne déplace pas le curseur |
+| Appui long (500 ms sans bouger) | Clic droit, tenu jusqu'au relâchement |
+| Deux doigts | Clic droit (second doigt posé avant la fin de l'attente) |
+| Glisser sur l'écran (plus de 8 px) | Le bouton gauche s'appuie et le curseur suit le doigt |
 | Clic droit | Bouton droit tenu tant que le doigt reste sur le bouton |
 | Clavier | Ouvre le clavier de l'appareil ; les lettres, chiffres, espace, effacement et Entrée sont envoyés au jeu |
 | Son (F10) | Coupe la musique et active les effets, comme dans l'original |
@@ -112,3 +114,27 @@ Le service worker ne s'enregistre ni sur `localhost` ni sur `127.0.0.1` (le cach
 | Site en 404 | Pages désactivé, ou workflow pas encore lancé | Settings > Pages > Source : GitHub Actions, puis relancer le workflow |
 | Import refusé (« pas un paquet ») | Fichier décompressé ou renommé par l'appareil | Renvoyer `heroquest-donnees.bin` tel quel |
 | Clés d'accès par appareil (comme Bestiora Azur) | Non reprises : le site ne contient rien à protéger, le paquet reste privé | À ajouter si le site doit un jour être réservé |
+
+
+Objet : HeroQuest 1991 : installation sur le téléphone
+
+Le fichier heroquest-donnees.bin (16 Mo) est en pièce jointe. Il contient le jeu : à garder pour soi, ne pas faire suivre.
+
+1. Enregistrer le paquet sur le téléphone
+Ouvrir la pièce jointe, puis Partager > « Enregistrer dans Fichiers » (iPhone), ou la télécharger (Android).
+
+2. Ajouter le jeu à l'écran d'accueil
+Ouvrir ce lien dans Safari (iPhone) ou Chrome (Android) :
+https://magend-salocin.github.io/heroquest_1991/
+- iPhone : bouton Partager (carré avec une flèche vers le haut) > « Sur l'écran d'accueil » > Ajouter.
+- Android : menu > « Ajouter à l'écran d'accueil » (ou « Installer l'application »).
+
+3. Importer le paquet (une seule fois)
+Lancer le jeu depuis l'icône de l'écran d'accueil, pas depuis le navigateur : les deux ne partagent pas leurs données. Choisir heroquest-donnees.bin dans Fichiers. Le jeu reste ensuite sur le téléphone et marche hors ligne.
+
+Commandes
+- Toucher l'écran : clic gauche. Glisser : le curseur suit le doigt.
+- Appui long ou toucher à deux doigts : clic droit (annuler, fermer).
+- Boutons : Clic droit, Clavier (nom des héros), Son, Passer l'intro. Le jeu est plus grand en paysage.
+
+Pour remplacer le paquet plus tard : ajouter ?importer à la fin de l'adresse, ou supprimer puis réinstaller l'icône.

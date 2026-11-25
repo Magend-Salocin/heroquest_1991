@@ -21,7 +21,8 @@ import { Son } from './son.js';
 import { brancherRoutines } from './lisible/routines.js';
 import { lireArchive } from './archive.js';
 import { chargerPaquet, importerPaquet } from './paquet.js';
-import { commandesTactilesVoulues, brancherCommandesTactiles } from './tactile.js';
+import { commandesTactilesVoulues, brancherCommandesTactiles, vibrer,
+  VIBRATION_CLIC_MS, VIBRATION_CLIC_DROIT_MS } from './tactile.js';
 
 // VGA, AdLib, souris, français, souris pour les 4 joueurs (format : notes/01-socle.md)
 const CONFIGURATION = Uint8Array.from([8, 0, 1, 0, 1, 0, 0, 0, 0]);
@@ -34,7 +35,11 @@ const RETARD_MAX_MS = 100;
 // Le jeu lit l'état des boutons (int 33h AX=3) sans mémoriser les clics : un appui plus court
 // qu'une image passerait inaperçu, et un doigt doit d'abord amener le curseur sur la cible.
 const DUREE_MIN_APPUI_MS = 150;
-const DELAI_APPUI_TACTILE_MS = 40;
+// Écran tactile : un doigt immobile reste en attente ; relevé, c'est un clic gauche, tenu
+// DUREE_APPUI_LONG_MS, un clic droit ; déplacé de plus de SEUIL_GLISSER_PX, il glisse
+// bouton gauche appuyé. Un second doigt posé pendant l'attente donne aussi le clic droit.
+const DUREE_APPUI_LONG_MS = 500;
+const SEUIL_GLISSER_PX = 8;
 const DUREE_TOUCHE_MS = 60;
 const OPTIONS = new URLSearchParams(location.search);
 
@@ -153,31 +158,64 @@ function brancherEntrees() {
     machine.souris.x = Math.max(0, Math.min(639, Math.floor(((e.clientX - r.left) / r.width) * 640)));
     machine.souris.y = Math.max(0, Math.min(199, Math.floor(((e.clientY - r.top) / r.height) * 200)));
   };
-  let doigt = null;                                  // toucher en cours : { id, appui }
+  // Geste tactile en cours : { id (premier doigt), ids, x, y (départ), etape, minuterie },
+  // etape : 'attente', 'gauche' (glisser) ou 'droit'.
+  let geste = null;
+
+  const passerAuClicDroit = (g) => {
+    clearTimeout(g.minuterie);
+    g.etape = 'droit';
+    appuyerBouton(2);
+    vibrer(VIBRATION_CLIC_DROIT_MS);
+  };
 
   ecran.addEventListener('pointerdown', (e) => {
     if (!machine) return;
     e.preventDefault();
-    position(e);
     if (e.pointerType === 'mouse') {
+      position(e);
       appuyerBouton(e.button === 2 ? 2 : 1);
       return;
     }
     try { ecran.setPointerCapture(e.pointerId); } catch { /* pointeur déjà levé */ }
-    doigt = { id: e.pointerId, appui: setTimeout(() => appuyerBouton(1), DELAI_APPUI_TACTILE_MS) };
+    if (geste) {                                     // second doigt
+      geste.ids.add(e.pointerId);
+      if (geste.etape === 'attente') passerAuClicDroit(geste);
+      return;
+    }
+    position(e);
+    const g = { id: e.pointerId, ids: new Set([e.pointerId]), x: e.clientX, y: e.clientY, etape: 'attente' };
+    g.minuterie = setTimeout(() => passerAuClicDroit(g), DUREE_APPUI_LONG_MS);
+    geste = g;
   });
   ecran.addEventListener('pointermove', (e) => {
-    if (machine && (e.pointerType === 'mouse' || (doigt && doigt.id === e.pointerId))) position(e);
+    if (!machine) return;
+    if (e.pointerType === 'mouse') { position(e); return; }
+    if (!geste || geste.id !== e.pointerId || geste.etape === 'droit') return;
+    if (geste.etape === 'attente') {
+      // Le curseur reste au point touché tant que le doigt n'a pas vraiment bougé.
+      if (Math.hypot(e.clientX - geste.x, e.clientY - geste.y) < SEUIL_GLISSER_PX) return;
+      clearTimeout(geste.minuterie);
+      geste.etape = 'gauche';
+      appuyerBouton(1);
+    }
+    position(e);
   });
-  const fin = (e) => {
-    if (!doigt || doigt.id !== e.pointerId) return;
-    clearTimeout(doigt.appui);
-    if (!appuis[1]) appuyerBouton(1);                // toucher plus court que le délai : clic quand même
-    relacherBouton(1);
-    doigt = null;
+  // Le geste finit au premier doigt relevé ; pointercancel (geste du système) ne clique pas.
+  const finGeste = (e) => {
+    if (!geste || !geste.ids.has(e.pointerId)) return;
+    clearTimeout(geste.minuterie);
+    if (geste.etape === 'droit') relacherBouton(2);
+    else if (geste.etape === 'gauche') relacherBouton(1);
+    else if (e.type === 'pointerup') {
+      appuyerBouton(1);
+      relacherBouton(1);
+      vibrer(VIBRATION_CLIC_MS);
+    }
+    geste = null;
   };
-  ecran.addEventListener('pointerup', fin);
-  ecran.addEventListener('pointercancel', fin);
+  ecran.addEventListener('pointerup', finGeste);
+  ecran.addEventListener('pointercancel', finGeste);
   window.addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') relacherBouton(e.button === 2 ? 2 : 1); });
   ecran.addEventListener('contextmenu', (e) => e.preventDefault());
 

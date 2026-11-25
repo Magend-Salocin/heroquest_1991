@@ -35,17 +35,33 @@
     #erreur-import { color: #f88; min-height: 1.5em; }
 
     /* Commandes tactiles (tactile.js) */
-    #commandes { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    #commandes, .groupe { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
     #commandes button { min-width: 72px; min-height: 48px; font-size: 16px; }
     #saisie { position: fixed; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; font-size: 16px; border: 0; padding: 0; }
+    #conseil-paysage { display: none; flex-basis: 100%; margin: 0; text-align: center; color: #888; font-size: 13px; }
     body.tactile { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
                    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
                    box-sizing: border-box; }
-    body.tactile #ecran, body.tactile #texte { width: min(100vw, calc((100dvh - 140px) * 4 / 3)); }
+    body.tactile #ecran { -webkit-touch-callout: none; }
+    body.tactile #ecran, body.tactile #texte { width: min(100vw, calc((100dvh - 160px) * 4 / 3)); }
+    @media (orientation: portrait) {
+      body.tactile #conseil-paysage { display: block; }
+    }
+    /* Paysage : l'écran prend toute la hauteur ; Clic droit sous le pouce gauche, les autres
+       boutons sous le pouce droit. */
     @media (orientation: landscape) {
-      body.tactile main { grid-template-columns: auto auto; align-items: center; }
-      body.tactile #ecran, body.tactile #texte { width: min(calc(100vw - 120px), calc((100dvh - 8px) * 4 / 3)); grid-column: 1; grid-row: 1 / span 3; }
-      body.tactile #commandes { flex-direction: column; }
+      body.tactile main { grid-template-columns: auto auto auto; grid-template-rows: 1fr 1fr; column-gap: 12px; align-items: center; }
+      body.tactile #commandes { display: contents; }
+      body.tactile .groupe { flex-direction: column; }
+      body.tactile .gauche { grid-column: 1; grid-row: 1 / span 2; }
+      body.tactile #commandes .gauche button { min-height: 96px; }
+      body.tactile .droite { grid-column: 3; grid-row: 1; align-self: end; }
+      body.tactile #passer-intro { grid-column: 3; grid-row: 2; align-self: start; }
+      body.tactile #ecran, body.tactile #texte, body.tactile #import { grid-column: 2; grid-row: 1 / span 2; }
+      body.tactile #ecran, body.tactile #texte {
+        width: min(calc(100vw - 220px - env(safe-area-inset-left) - env(safe-area-inset-right)),
+                   calc((100dvh - 8px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 4 / 3)); }
+      body.tactile #etat { grid-column: 2; grid-row: 3; }
       body.tactile #etat:empty { display: none; }
     }
   </style>
@@ -63,9 +79,12 @@
     <canvas id="ecran" width="320" height="200"></canvas>
     <pre id="texte" hidden></pre>
     <div id="commandes" hidden>
-      <button id="clic-droit" type="button">Clic droit</button>
-      <button id="clavier" type="button">Clavier</button>
-      <button id="son" type="button">Son (F10)</button>
+      <div class="groupe gauche"><button id="clic-droit" type="button">Clic droit</button></div>
+      <div class="groupe droite">
+        <button id="clavier" type="button">Clavier</button>
+        <button id="son" type="button">Son (F10)</button>
+      </div>
+      <p id="conseil-paysage">Plus grand en paysage. Appui long ou deux doigts : clic droit.</p>
     </div>
     <div id="etat"></div>
     <button id="passer-intro" type="button" hidden>Passer l'intro (Échap)</button>

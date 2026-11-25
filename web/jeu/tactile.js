@@ -1,6 +1,6 @@
-// Commandes tactiles, sous l'écran (portrait) ou à côté (paysage). Toucher l'écran du jeu
-// déplace le curseur et clique (bouton gauche, voir principal.js) ; ces boutons ajoutent ce
-// qu'un écran tactile ne sait pas faire :
+// Commandes tactiles, sous l'écran (portrait) ou de part et d'autre (paysage). Les gestes sur
+// l'écran du jeu (toucher, appui long, deux doigts, glisser) sont dans principal.js ; ces
+// boutons ajoutent ce qu'un écran tactile ne sait pas faire :
 //   Clic droit   le bouton droit de la souris, tenu tant que le doigt reste sur le bouton
 //   Clavier      ouvre le clavier de l'appareil (nom des héros)
 //   Son          F10 : coupe la musique et active les effets, comme dans l'original
@@ -16,6 +16,14 @@ function toucheDe(caractere) {
   if (LETTRE.test(caractere)) return `Key${caractere}`;
   if (CHIFFRE.test(caractere)) return `Digit${caractere}`;
   return SIGNES[caractere];
+}
+
+export const VIBRATION_CLIC_MS = 10;
+export const VIBRATION_CLIC_DROIT_MS = 30;
+
+// Retour haptique bref (Android ; Safari sur iPhone n'a pas l'API et ne vibre pas).
+export function vibrer(ms) {
+  if (navigator.vibrate) navigator.vibrate(ms);
 }
 
 export function commandesTactilesVoulues(options) {
@@ -34,6 +42,7 @@ export function brancherCommandesTactiles(actions) {
   boutonDroit.addEventListener('pointerdown', (e) => {
     boutonDroit.setPointerCapture(e.pointerId);
     actions.appuyerBouton(2);
+    vibrer(VIBRATION_CLIC_DROIT_MS);
   });
   for (const fin of ['pointerup', 'pointercancel']) {
     boutonDroit.addEventListener(fin, () => actions.relacherBouton(2));

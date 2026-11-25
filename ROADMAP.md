@@ -79,7 +79,7 @@ Reste :
 
 1. PHP sert le jeu et les fichiers de données, et garde les sauvegardes : fait pour un seul joueur (`web/fichiers.php`, dossier `web/sauvegardes/`) ; reste une sauvegarde par joueur.
 2. Son : fait. Les morceaux du pilote AdLib sont rendus en WAV (`outils/son.py` puis `outils/sons.mjs`) et joués par la page ; un seul type de son, l'AdLib. Reste à les comparer à l'oreille avec DOSBox-X, et le MP3 si un encodeur est installé.
-3. Mobile : fait le 20 novembre 2026. Le moteur est publié sur GitHub Pages sans rien du jeu d'origine ; les fichiers du jeu, le code traduit et les sons arrivent par un paquet importé sur l'appareil ; commandes tactiles, hors ligne, installation sur l'écran d'accueil ([WEB_DEPLOIEMENT.md](WEB_DEPLOIEMENT.md)). Reste : essai sur un vrai iPhone.
+3. Mobile : fait le 20 novembre 2026. Le moteur est publié sur GitHub Pages sans rien du jeu d'origine ; les fichiers du jeu, le code traduit et les sons arrivent par un paquet importé sur l'appareil ; commandes tactiles, hors ligne, installation sur l'écran d'accueil ([WEB_DEPLOIEMENT.md](WEB_DEPLOIEMENT.md)). 25 novembre 2026 : clic droit par appui long ou deux doigts, vibration, disposition paysage. Reste : essai sur un vrai iPhone.
 4. Langues : fait, les 5 langues se choisissent dans l'adresse de la page (`?langue=en`), l'écran des drapeaux de l'intro n'existant qu'en EGA.
 
 ## Décisions à prendre

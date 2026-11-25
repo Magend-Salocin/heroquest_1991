@@ -34,7 +34,7 @@ Son : comme dans l'original, la musique joue au départ (dès l'intro) et les ef
 | `jeu/exepack.js` | décompression EXEPACK et relocations, comme DOS au chargement |
 | `jeu/principal.js` | la page : source des fichiers (serveur PHP ou paquet), boucle au rythme du temps réel, affichage, entrées souris, tactiles et clavier |
 | `jeu/paquet.js`, `jeu/archive.js` | paquet de données du site publié (IndexedDB, sauvegardes) ; format d'archive commun avec `fichiers.php` |
-| `jeu/tactile.js` | commandes tactiles : clic droit, clavier de l'appareil, F10 |
+| `jeu/tactile.js` | commandes tactiles : clic droit, clavier de l'appareil, F10, vibration ; gestes sur l'écran (appui long, deux doigts) dans `principal.js` |
 | `sw.js`, `manifest.webmanifest`, `icones/` | hors ligne et installation sur l'écran d'accueil (site publié) |
 | `jeu/lisible/` | le code réécrit à la main, lisible (voir « Code lisible ») |
 | `jeu/clavier.js` | codes clavier du PC |
