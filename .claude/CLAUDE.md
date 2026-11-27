@@ -55,6 +55,6 @@ Sur Windows, la sortie console de Python est en cp1252 : les accents apparaissen
 
 ## État (27 novembre 2026)
 
-Phases 0 à 2 faites, le jeu se joue dans le navigateur (phase 3). En cours : réécriture lisible (41 routines de QUEST.EXE sur 380 : hasard, combat, déplacement, tour d'un personnage, objets de l'inventaire, fouille du trésor) et phase 5 (cours dans `cours/`, inspecteur, vue moderne : [plan](../docs/PLAN-cours-vue-moderne.md)). Prochaines étapes dans [ROADMAP.md](../ROADMAP.md), section « Reste » des phases 3 et 4.
+Phases 0 à 2 faites, le jeu se joue dans le navigateur (phase 3). En cours : réécriture lisible (45 routines de QUEST.EXE sur 380 : hasard, combat, déplacement, tour d'un personnage, objets de l'inventaire, fouilles) et phase 5 (cours dans `cours/`, inspecteur, vue moderne : [plan](../docs/PLAN-cours-vue-moderne.md)). Prochaines étapes dans [ROADMAP.md](../ROADMAP.md), section « Reste » des phases 3 et 4.
 
 Skill du projet : `/reecrire-routine` pour la réécriture lisible d'une routine.

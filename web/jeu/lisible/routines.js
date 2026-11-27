@@ -301,6 +301,28 @@ export const ROUTINES_QUEST = {
     nom: 'fouille_tresor', cout: 12, sortie: [], etapes: true,
     executer: ({ fouilles }) => fouilles.fouillerTresor(),
   },
+
+  // ---- Fouille des portes secrètes et des pièges (fouilles.js)
+  0x72f4: {
+    nom: 'ouvre_porte_secrete', cout: 8, sortie: ['bx'], etapes: true,
+    // Entrée BX : le bord (grille des murs) qui porte la porte.
+    executer: ({ fouilles }, m) => fouilles.ouvrirPorteSecrete(m.bx),
+  },
+  0x7247: {
+    nom: 'fouille_case', cout: 30, sortie: [], etapes: true,
+    // Entrée BX : la case dans grille_zones.
+    executer: ({ fouilles }, m) => fouilles.fouillerCase(m.bx),
+  },
+  0x720a: {
+    nom: 'cherche_portes_pieges', cout: 20, sortie: [], etapes: true,
+    executer: ({ fouilles }) => fouilles.chercherPortesEtPieges(),
+  },
+  // Atteinte par un saut depuis clic_tour (DI fiche) ; finit par ret, ou par un saut vers la fin
+  // de fouille ou l'événement de la zone.
+  0x6dfa: {
+    nom: 'fouille_portes', cout: 12, sortie: [], etapes: true,
+    executer: ({ fouilles }) => fouilles.fouillerPortes(),
+  },
 };
 
 // Remplace, dans la table des routines générées, l'entrée de chaque routine réécrite.

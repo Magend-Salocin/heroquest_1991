@@ -40,6 +40,18 @@ const placerMortVivant = (cas) => {
   octetDS(cas, fiche + 3, lireOctetDS(cas, caseZones) & 0x3f);
   return numero;
 };
+// Portes secrètes (bit 0x08, à gauche ou en haut, parfois déjà révélées) et pièges (fosse cachée,
+// chute de pierre, lance) semés sur les cases du plateau.
+const semerPortesEtPieges = (cas) => {
+  for (let n = 0; n < 80; n++) {
+    const index = alea(494);
+    octetDS(cas, 0x566f + index, lireOctetDS(cas, 0x566f + index) | 0x08 | (alea(2) ? 0x10 : 0x20) | (alea(5) === 0 ? 0x04 : 0));
+  }
+  for (let n = 0; n < 40; n++) {
+    const index = alea(494);
+    if (lireOctetDS(cas, 0x546f + index) & 0x3f) octetDS(cas, 0x586f + index, [0x32, 0x34, 0x36][alea(3)]);
+  }
+};
 // Pioche des trésors : les 25 cartes mélangées, puis FFh ; carte_tresor (DS:4655) sur le FFh.
 // Une fois sur quatre, des cartes sont déjà sorties du jeu ; celles qui sont toujours remises sous
 // la pioche (or, arbalète, monstres) restent : sans carte d'or, une pioche de monstres errants
@@ -99,6 +111,31 @@ const ENTREES = {
       if (numero > 1 && alea(2)) octetDS(cas, 0x4d4a + 10 * (numero - 2) + 6, 4);
     }
   },
+  // Fouille des portes et des pièges : DI fiche, icône enfoncée, zones déjà cherchées ou à
+  // événement, zone_heros quelconque (lue avant d'être recalculée), piège déjà trouvé une fois
+  // sur quatre (DS:37EB = 1), portes secrètes et pièges semés sur le plateau.
+  fouille_portes: (cas) => {
+    const fiche = lireOctetDS(cas, 0x4637) | (lireOctetDS(cas, 0x4638) << 8);
+    cas.etat.di = fiche;
+    octetDS(cas, 0x42ad, alea(4) ? 0x1c : 0x0b);
+    octetDS(cas, 0x3fa7, alea(6) === 0 ? 4 : (fiche - 0x4663) / 26);
+    for (let zone = 0; zone < 43; zone++) {
+      const tirage = alea(8);
+      octetDS(cas, 0x4b9b + zone, tirage < 5 ? 0 : tirage === 5 ? 0xff : 1 + alea(30));
+    }
+    octetDS(cas, 0x3f94, alea(43));
+    octetDS(cas, 0x37eb, alea(4) === 0 ? 1 : 0x34);
+    octetDS(cas, 0x37ec, 0);
+    semerPortesEtPieges(cas);
+  },
+  cherche_portes_pieges: (cas) => semerPortesEtPieges(cas),
+  fouille_case: (cas) => {
+    semerPortesEtPieges(cas);
+    cas.etat.bx = 0x546f + 27 + alea(494 - 54);           // pas au bord : les voisines existent
+    if (alea(2)) octetDS(cas, cas.etat.bx + 0x200, 0x08 | (alea(2) ? 0x10 : 0x20));
+    if (alea(2)) octetDS(cas, cas.etat.bx + 0x400, [0x32, 0x34, 0x36][alea(3)]);
+  },
+  ouvre_porte_secrete: (cas) => { cas.etat.bx = 0x566f + alea(494); },
   tire_carte: (cas) => melangerPioche(cas),
   remet_carte: (cas) => { melangerPioche(cas); cas.etat.ax = alea(25); },
   monstre_actif_case: (cas) => {

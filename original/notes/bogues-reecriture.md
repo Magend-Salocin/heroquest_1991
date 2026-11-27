@@ -47,3 +47,12 @@ Comportements du code de 1991 trouvés en réécrivant les routines dans `web/je
 | `utilise_objet`, eau bénite | Seules les 30 premières cases de `ordre_cases_vue` autour du coin de la zone sont regardées, pas toute la pièce. Le nombre de morts est écrit comme un seul chiffre dans le message : 10 morts afficheraient « : ». | 03-regles.md : « de la pièce » |
 | `utilise_objet`, potion curative | Boire une curative efface toutes les autres potions en cours (+0x17 ne garde que le bit de la curative, qui n'y est jamais posé). | 03-regles.md le dit déjà |
 | `utilise_objet`, armes | Lâcher l'arme en main écrit un mot nul en +0x11 : les artefacts en service (+0x12) sont effacés avec elle. | 03-regles.md le dit déjà |
+
+## Fouilles
+
+| Routine | Constat | Note à revoir |
+| --- | --- | --- |
+| `fouille_case` (0x7247) | Porte secrète sur le bord de la case elle-même : `push bx`, `push cx`, puis `pop bx`, `pop cx` dans le même ordre. BX reçoit le pas (1 ou 26) et `sub bx, cx` donne pas - adresse : le piège de cette case est cherché entre DS:A9A5 et DS:ABAB selon la case (variables des boîtes de message et des écrans), qui peut être modifiée si elle vaut 32h (incrémentée) ou 36h (mise à 0). Le piège de la case elle-même n'est pas trouvé. | 03-regles.md, « Portes secrètes et pièges » |
+| `fouille_case` | Porte d'une voisine trouvée : la zone de l'autre côté est passée à `marque_zone_vue` sans masque (`and al, 3Fh` absent), avec les bits « case vue » (40h, 80h). Pour la porte du bord de la case, le masque est fait. | |
+| `fouille_portes` (0x6DFA) | Le test « déjà fouillée » du début lit `zone_heros` avant que `cherche_portes_pieges` la recalcule : c'est la zone du dernier calcul, pas forcément celle du héros. | |
+| `fouille_portes` | Le piège trouvé est noté dans `position_tuile_carte` (DS:37EB), une variable du dessin de la carte, jamais remise à 0 avant la recherche : s'il vaut encore 1, la fouille sort sans message ni marque, même sans rien trouver. | |
