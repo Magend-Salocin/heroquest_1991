@@ -14,11 +14,16 @@
 // Bascule : bouton « Vue » ou touche F9 ; le choix est gardé dans le navigateur. index.html?vue=moderne
 // et ?vue=origine forcent le choix sans le garder. La vue moderne ne remplace que le plateau, pendant
 // une partie (phaseDuJeu) ; l'inventaire, les menus et les autres écrans restent ceux d'origine.
-// Autour du plateau : fiches des héros, tour en cours, dés, journal des messages.
+// Autour du plateau : fiches des héros, tour en cours, dés, actions, journal des messages.
+//
+// Commandes (commandes.js) : un clic sur une case devient un clic sur la même case de l'écran
+// d'origine, une action du panneau un clic sur son icône ; clic droit, ou appui long au doigt,
+// donne le clic droit du jeu. Rien n'est écrit en mémoire : les règles restent celles du jeu.
 
 import { lireEtat, LARGEUR, HAUTEUR } from './etat.js';
 import { phaseDuJeu } from './pile.js';
 import { lireMessage, journaliserMessages } from './messages.js';
+import { zonesPanneau, positionEcranCase } from './commandes.js';
 
 const LARGEUR_CASE = 64;
 const HAUTEUR_CASE = 32;
@@ -36,6 +41,8 @@ const CLE_VUE = 'heroquest-vue';             // localStorage : 'moderne' ou 'ori
 const TAILLE_JOURNAL = 6;
 const PERIODE_PANNEAU_MS = 100;
 const IMAGES_STABLES = 3;                  // images concordantes avant de changer d'écran (pile estimée)
+const DUREE_APPUI_LONG_MS = 500;           // au doigt : appui long = clic droit
+const ORDRE_ACTIONS = ['mode_attaque', 'fouille_tresor', 'fouille_portes', 'ouvre_portes', 'action_sort', 'inventaire_sorts', 'mode_regarder', 'fin_tour'];
 
 const COULEUR = {
   fond: '#0b0d12',
@@ -84,7 +91,9 @@ function element(parent, balise, classe, texte) {
   return e;
 }
 
-export function creerVueModerne(conteneur, options) {
+// jeu.cliquer(x, y, bouton) : clic sur l'écran d'origine (320 × 200 ; x null : sans bouger le curseur),
+// bouton 1 gauche, 2 droit (principal.js).
+export function creerVueModerne(conteneur, options, jeu) {
   const feuille = document.createElement('link');
   feuille.rel = 'stylesheet';
   feuille.href = new URL('./plateau.css', import.meta.url).href;
@@ -100,6 +109,9 @@ export function creerVueModerne(conteneur, options) {
   const titreTour = element(panneau, 'p', 'tour');
   const fiches = element(panneau, 'div', 'fiches');
   const des = element(panneau, 'p', 'des');
+  element(panneau, 'h2', null, 'Actions');
+  const actions = element(panneau, 'div', 'actions');
+  const aide = element(panneau, 'p', 'aide', 'Clic sur une case : y aller (ou arrêter les dés, viser). Clic droit ou appui long : fin du tour, fermer un message.');
   element(panneau, 'h2', null, 'Messages');
   const journal = element(panneau, 'ol', 'journal');
   const bouton = element(conteneur, 'button', null);
@@ -125,6 +137,9 @@ export function creerVueModerne(conteneur, options) {
   let ecranAffiche = 'autre';
   let ecranVu = 'autre';
   let imagesConcordantes = 0;
+  let decalage = [0, 0];                     // translation du plateau dans le canvas (dernière image)
+  let machineCourante = null;
+  let zones = [];
   const ctx = canvas.getContext('2d');
   let atlas = null;
   chargerAtlas().then((a) => { atlas = a; });
@@ -300,7 +315,8 @@ export function creerVueModerne(conteneur, options) {
     }
     if (!camera) return;
     ctx.save();
-    ctx.translate(Math.round(largeur / 2 - camera[0]), Math.round(hauteur / 2 - camera[1]));
+    decalage = [Math.round(largeur / 2 - camera[0]), Math.round(hauteur / 2 - camera[1])];
+    ctx.translate(...decalage);
 
     const cases = etat.plateau.cases;
     const personnages = new Map();
@@ -328,7 +344,71 @@ export function creerVueModerne(conteneur, options) {
     ctx.restore();
   }
 
-  // ---- Panneau : tour, fiches, dés, journal
+  // ---- Commandes
+
+  // Case du plateau sous un point du canvas (inverse de projeter).
+  function caseSous(e) {
+    const r = canvas.getBoundingClientRect();
+    const u = (e.clientX - r.left - decalage[0]) / (LARGEUR_CASE / 2);   // x - y
+    const v = (e.clientY - r.top - decalage[1]) / (HAUTEUR_CASE / 2);    // x + y
+    const x = Math.floor((u + v) / 2);
+    const y = Math.floor((v - u) / 2);
+    return x >= 0 && x < LARGEUR && y >= 0 && y < HAUTEUR ? { x, y } : null;
+  }
+
+  function cliquerCase(e) {
+    const c = caseSous(e);
+    if (!c || !machineCourante) return;
+    const point = positionEcranCase(machineCourante, c.x, c.y);
+    if (!point) {
+      aide.textContent = `La case (${c.x}, ${c.y}) n'est pas dans la vue d'origine : approchez-vous, ou cliquez sur l'écran d'origine.`;
+      return;
+    }
+    jeu.cliquer(point.x, point.y, 1);
+  }
+
+  let appui = null;                          // { minuterie, droit } pendant un appui au doigt
+  canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+  canvas.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    if (e.pointerType === 'mouse') {
+      if (e.button === 2) jeu.cliquer(null, null, 2);
+      else if (e.button === 0) cliquerCase(e);
+      return;
+    }
+    const a = { droit: false };
+    a.minuterie = setTimeout(() => { a.droit = true; jeu.cliquer(null, null, 2); }, DUREE_APPUI_LONG_MS);
+    appui = a;
+  });
+  canvas.addEventListener('pointerup', (e) => {
+    if (e.pointerType === 'mouse' || !appui) return;
+    clearTimeout(appui.minuterie);
+    if (!appui.droit) cliquerCase(e);
+    appui = null;
+  });
+  canvas.addEventListener('pointercancel', () => { if (appui) clearTimeout(appui.minuterie); appui = null; });
+
+  // Boutons d'action, dans l'ordre de ORDRE_ACTIONS ; grisés comme l'icône d'origine.
+  function remplirActions() {
+    const boutons = new Map([...actions.children].map((b) => [b.dataset.routine, b]));
+    for (const routine of ORDRE_ACTIONS) {
+      const zone = zones.find((z) => z.routine === routine);
+      let b = boutons.get(routine);
+      if (!zone) { b?.remove(); continue; }
+      if (!b) {
+        b = element(actions, 'button', null, zone.libelle);
+        b.type = 'button';
+        b.dataset.routine = routine;
+        b.addEventListener('click', () => {
+          const z = zones.find((candidate) => candidate.routine === routine);
+          if (z) jeu.cliquer(z.x, z.y, 1);
+        });
+      }
+      b.disabled = !zone.utilisable;
+    }
+  }
+
+  // ---- Panneau : tour, fiches, dés, actions, journal
 
   const pluriel = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
 
@@ -354,6 +434,7 @@ export function creerVueModerne(conteneur, options) {
       ? `Déplacement : ${pluriel(etat.deplacementRestant, 'case')} (${pluriel(etat.desDeplacement, 'dé')}) · ${combat}`
       : combat;
 
+    remplirActions();
     journal.replaceChildren();
     for (const texte of messages) element(journal, 'li', null, texte);
   }
@@ -376,6 +457,7 @@ export function creerVueModerne(conteneur, options) {
         journaliserMessages(m, (numero) => noterMessage(m, numero));
       }
       if (choix !== 'moderne') { document.body.classList.remove('plateau-actif'); return; }
+      machineCourante = m;
       const phase = phaseDuJeu(m);
       const etat = lireEtat(m);
       // La phase vient d'une pile estimée : un mot isolé peut tromper une image ; on attend qu'elle se confirme.
@@ -388,6 +470,7 @@ export function creerVueModerne(conteneur, options) {
       const maintenant = performance.now();
       if (maintenant - dernierPanneau >= PERIODE_PANNEAU_MS) {
         dernierPanneau = maintenant;
+        zones = zonesPanneau(m);
         remplirPanneau(etat, phase);
       }
     },

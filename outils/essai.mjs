@@ -3,7 +3,10 @@
 // actions : liste séparée par des virgules, exécutée dans l'ordre, par exemple
 //   "attendre:3,clic:160:100,touche:39,attendre:2,capture:a.png"
 // (souris en coordonnées d'écran 320 x 200 ; touche = code clavier en hexadécimal).
-// ETAT=etat.json écrit en plus l'état de la partie à la fin (web/jeu/vue/etat.js).
+// ETAT=etat.json écrit en plus l'état de la partie à la fin (web/jeu/vue/etat.js) ; MEMOIRE=memoire.bin
+// la mémoire entière (1 Mo), pour comparer deux parcours.
+// Commandes de la vue moderne (web/jeu/vue/commandes.js) : case:x:y clique la case (x, y) du plateau
+// sur l'écran d'origine ; zone:routine clique l'icône du panneau qui lance cette routine (zone:fin_tour).
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -79,11 +82,19 @@ export function avancer(m, secondes) {
 async function principal() {
   const [secondes = '5', capture = 'capture.png', actions = ''] = process.argv.slice(2);
   const m = await machine();
+  const commandes = await import('../web/jeu/vue/commandes.js');
   avancer(m, Number(secondes));
   for (const action of actions.split(',').filter(Boolean)) {
     const [nom, ...reste] = action.split(':');
     const [a, b] = nom === 'capture' ? [reste.join(':')] : reste;
     if (nom === 'attendre') avancer(m, Number(a));
+    else if (nom === 'case' || nom === 'zone') {
+      const point = nom === 'case' ? commandes.positionEcranCase(m, Number(a), Number(b))
+        : commandes.zonesPanneau(m).find((z) => z.routine === a);
+      if (!point) { console.log(`${action} : hors de la vue d'origine`); continue; }
+      m.souris.x = point.x * 2; m.souris.y = point.y;
+      avancer(m, 0.2); m.souris.boutons = 1; avancer(m, 0.2); m.souris.boutons = 0; avancer(m, 0.3);
+    }
     else if (nom === 'clic') {
       m.souris.x = Number(a) * 2; m.souris.y = Number(b);
       avancer(m, 0.2); m.souris.boutons = 1; avancer(m, 0.2); m.souris.boutons = 0; avancer(m, 0.3);
@@ -98,6 +109,7 @@ async function principal() {
     const { lireEtat } = await import('../web/jeu/vue/etat.js');
     fs.writeFileSync(process.env.ETAT, JSON.stringify(lireEtat(m), null, 1));
   }
+  if (process.env.MEMOIRE) fs.writeFileSync(process.env.MEMOIRE, m.mem);
   if (m.mode === 0x13 || m.planaire) capturer(m, capture);
   else console.log(m.texte());
   console.log(`t = ${(m.t / INSTRUCTIONS_PAR_MS / 1000).toFixed(1)} s, IP ${m.ip.toString(16)}, mode ${m.mode.toString(16)}, arrêt ${m.arret}`);

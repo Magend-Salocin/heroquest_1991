@@ -1,6 +1,6 @@
 // Essai de la page dans un vrai Chrome (sans fenêtre), par le protocole DevTools.
 //   node navigateur.mjs <url> <capture.png> [actions]
-// actions : "attendre:5,clic:160:100,touche:Space,capture:a.png,etat" (souris en coordonnées
+// actions : "attendre:5,clic:160:100,clicpage:500:380,touche:Space,capture:a.png,etat" (souris en coordonnées
 // de l'écran du jeu 320 x 200 ; touche = KeyboardEvent.code ; etat = texte sous l'écran).
 // Lancer d'abord le serveur : php -S 127.0.0.1:8765 -t web
 
@@ -63,8 +63,9 @@ async function principal() {
     else if (nom === 'capture') await capturer(reste.join(':'));
     else if (nom === 'etat') console.log(await evaluer(`document.querySelector('#etat').textContent`));
     else if (nom === 'eval') console.log(JSON.stringify(await evaluer(reste.join(':'))));
-    else if (nom === 'clic') {
-      const [x, y] = await point(Number(reste[0]), Number(reste[1]));
+    else if (nom === 'clic' || nom === 'clicpage') {
+      // clic : coordonnées de l'écran du jeu (320 × 200) ; clicpage : coordonnées de la page.
+      const [x, y] = nom === 'clic' ? await point(Number(reste[0]), Number(reste[1])) : [Number(reste[0]), Number(reste[1])];
       await envoyer('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
       await attendre(150);
       await envoyer('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });

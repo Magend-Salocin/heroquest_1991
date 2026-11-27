@@ -126,7 +126,9 @@ La lecture se fait dans le segment de données du jeu (`machine.L + 0x97C`), pas
 
 Un occupant a une `sorte` : `monstre` (avec son `numero` dans `monstres`), `éboulis`, `piège` (avec `cache` pour une fosse non trouvée), `escalier`, `meuble` (`nom` ; `suite` pour les cases supplémentaires d'un meuble). Les pièges cachés et les portes secrètes sont présents dans l'état : c'est à la vue de ne pas montrer ce que les héros n'ont pas trouvé.
 
-Pour l'écrire en JSON à la fin d'un essai (ici au début de la 1re quête) :
+Dans `outils/essai.mjs`, `case:x:y` et `zone:routine` jouent les commandes de la vue moderne, et `MEMOIRE=fichier` écrit la mémoire entière à la fin. Le 27 novembre 2026, un parcours joué par `case:4:0,zone:mode_attaque,zone:fin_tour` et le même joué par des clics directs sur l'écran d'origine laissent une mémoire et une image identiques. Dans `outils/navigateur.mjs`, `clicpage:x:y` clique un point de la page (le canvas de la vue moderne).
+
+Pour écrire l'état en JSON à la fin d'un essai (ici au début de la 1re quête) :
 
 ```bash
 ETAT=etat.json node essai.mjs 5 plateau.png "clic:68:128,attendre:3,clic:160:44,attendre:4,clic:160:180,attendre:4"
@@ -152,11 +154,12 @@ ETAT=etat.json node essai.mjs 5 plateau.png "clic:68:128,attendre:3,clic:160:44,
 
 ## Vue moderne
 
-Le bouton sous l'écran, ou la touche F9, passe de l'écran d'origine à la vue moderne (`jeu/vue/plateau.js`) ; le choix est gardé dans le navigateur, et `?vue=moderne` ou `?vue=origine` le forcent sans le garder. Pendant une partie, sur le plateau, un canvas dessine la partie en isométrique (cases de 64 × 32), avec à droite (en dessous en portrait) un panneau : tour en cours (héros ou Morcar), fiches des héros avec leur portrait (`vue/images/portraits/`), dés de déplacement et du dernier combat, journal des 6 derniers messages. L'écran d'origine passe en petit dans le coin du plateau, toujours jouable : pour l'instant, on joue sur lui. L'inventaire, les menus et les autres écrans restent ceux d'origine, en grand (`phaseDuJeu`, confirmée sur 3 images de suite). La vue moderne ne fait que lire `lireEtat` à chaque image ; les règles et les dés restent ceux du code d'origine (décision D6 de la roadmap).
+Le bouton sous l'écran, ou la touche F9, passe de l'écran d'origine à la vue moderne (`jeu/vue/plateau.js`) ; le choix est gardé dans le navigateur, et `?vue=moderne` ou `?vue=origine` le forcent sans le garder. Pendant une partie, sur le plateau, un canvas dessine la partie en isométrique (cases de 64 × 32), avec à droite (en dessous en portrait) un panneau : tour en cours (héros ou Morcar), fiches des héros avec leur portrait (`vue/images/portraits/`), dés de déplacement et du dernier combat, actions, journal des 6 derniers messages. L'écran d'origine passe en petit dans le coin du plateau, toujours jouable. L'inventaire, les menus et les autres écrans restent ceux d'origine, en grand (`phaseDuJeu`, confirmée sur 3 images de suite). La vue moderne ne fait que lire `lireEtat` à chaque image ; les règles et les dés restent ceux du code d'origine (décision D6 de la roadmap).
 
 - Seuls les murs du fond (bords haut et gauche de chaque case) sont dessinés ; une case dont seul le bord est connu n'a qu'un muret.
 - On ne montre que ce que les héros ont vu : cases vues, monstres vus et vivants, pièges trouvés, portes secrètes ouvertes (une porte secrète cachée est dessinée comme un mur).
 - La caméra suit le personnage courant.
+- Commandes (`jeu/vue/commandes.js`) : elles passent toutes par l'entrée du jeu, jamais par la mémoire. Un clic sur une case devient un clic sur la même case de l'écran d'origine (position retrouvée comme le fait `clic_plateau`, dans `position_cases` et `ordre_cases_vue`) ; il fait marcher le héros, arrête les dés ou vise. Une case hors des 52 cases de la vue d'origine ne peut pas être cliquée : le panneau le signale. Un bouton d'action clique l'icône correspondante de `zones_panneau`, et il est grisé comme elle. Clic droit, ou appui long au doigt : le clic droit du jeu (fin du tour, fermer un message).
 - Images de l'atlas (`vue/images/atlas.json`) quand il existe ; sinon, ou pour une image absente, des formes simples (losanges, pans de mur, blocs, figurines).
 
 ## Graphismes de la vue moderne

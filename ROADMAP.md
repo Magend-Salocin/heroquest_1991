@@ -97,7 +97,7 @@ But : se servir du jeu pour enseigner la programmation, et proposer une seconde 
 | 7 | Script de découpe des planches | fait le 27 novembre 2026 (`outils/decouper-planches.py`, `outils/planches.json`) |
 | 8 | Vue moderne : plateau en lecture seule | fait le 27 novembre 2026 (`?vue=moderne`, formes simples en attendant les planches) |
 | 9 | Vue moderne : bascule et interface | fait le 27 novembre 2026 (bouton et F9, panneau des héros, dés, journal des messages ; reste un essai sur téléphone) |
-| 10 | Vue moderne : commandes | à faire |
+| 10 | Vue moderne : commandes | fait le 27 novembre 2026 (clic sur une case, actions, clic droit et appui long ; mémoire identique à un parcours joué sur l'écran d'origine) |
 | 11 | Vue moderne : graphismes définitifs | à faire |
 
 ## Décisions à prendre

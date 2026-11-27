@@ -147,6 +147,23 @@ function relacherBouton(bit) {
   }, Math.max(0, reste));
 }
 
+// Clic de la vue moderne sur l'écran d'origine (coordonnées 320 × 200 ; x null : le curseur ne bouge
+// pas). Le curseur est posé d'abord, pour que le jeu le lise avant de voir le bouton.
+const DELAI_AVANT_CLIC_MS = 60;
+function cliquerJeu(x, y, bouton) {
+  if (!machine) return;
+  if (x !== null) {
+    machine.souris.x = Math.max(0, Math.min(639, x * 2));
+    machine.souris.y = Math.max(0, Math.min(199, y));
+  }
+  const bit = bouton === 2 ? 2 : 1;
+  setTimeout(() => {
+    appuyerBouton(bit);
+    relacherBouton(bit);
+    vibrer(bit === 2 ? VIBRATION_CLIC_DROIT_MS : VIBRATION_CLIC_MS);
+  }, DELAI_AVANT_CLIC_MS);
+}
+
 // Une touche du PC appuyée puis relâchée (commandes tactiles).
 function taper(touche, ascii) {
   const code = codeClavier(touche);
@@ -333,7 +350,7 @@ async function demarrer() {
     inspecteur = creerInspecteur(document.querySelector('main'));
   }
   const { creerVueModerne } = await import('./vue/plateau.js');
-  vueModerne = creerVueModerne(document.querySelector('main'), OPTIONS);
+  vueModerne = creerVueModerne(document.querySelector('main'), OPTIONS, { cliquer: cliquerJeu });
   etat.textContent = '';
 
   donnees.fichiers.set('QUEST.CFG', configuration(donnees.fichiers.get('QUEST.CFG')));
