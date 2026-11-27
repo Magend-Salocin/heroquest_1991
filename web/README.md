@@ -66,15 +66,17 @@ Le résultat est identique à l'original par construction : même mémoire, mêm
 | `combat.js` | dés de combat, attaque d'un héros, attaque d'un monstre |
 | `deplacement.js` | dés de déplacement, fin du déplacement, flèches, les 4 pas, pièges cachés, téléports des quêtes 10 et 16, clic sur le plateau, chemin automatique |
 | `tour.js` | tour d'un personnage : préparation, tempête, réveil d'un héros endormi, boucle du tour ; clic sur une zone du panneau, fin du tour |
+| `inventaire.js` | liste des objets d'une page (bits de la fiche vers la liste, objets en service), règles d'un clic sur un objet (armures, armes, artefacts, potions, eau bénite) |
 | `messages.js` | numéros des messages utilisés, avec leur texte |
 | `adresses.gen.js` | adresse de chaque routine nommée, générée par `outils/adresses.py` depuis `original/symboles.txt` |
 | `routines.js` | branchement : adresse d'origine -> méthode, registres rendus aux appelants, temps compté |
 
-Réécrites à ce jour (QUEST.EXE), 30 routines :
+Réécrites à ce jour (QUEST.EXE), 36 routines :
 
 - hasard et combat : `hasard`, `de6_moins_un`, `de_combat`, `compte_cranes`, `calcule_des_monstre`, `bonus_attaque_heros`, `calcule_defense_heros`, `calcule_attaque_heros`, `attaque_heros`, `combat_monstre`, `attaque_contre_heros` ;
 - déplacement : `des_deplacement_tour`, `tirage_deplacement` (avec `lancer_deplacement`), `fin_deplacement`, `arrete_deplacement`, `fleches_deplacement`, `pas_gauche`, `pas_droite`, `pas_haut`, `pas_bas` (avec `pas_fait`, `personnage_en_dx`, `porte_reveille`), `pas_automatique`, `clic_plateau`, `chemin_heros` (avec `chemin_essaie` et `pas_permis`), `tire_teleport`, `entre_piege` ;
-- tour d'un personnage : `tour_personnage`, `commandes_tour`, `clic_tour`, `zone_panneau`, `fin_tour`.
+- tour d'un personnage : `tour_personnage`, `commandes_tour`, `clic_tour`, `zone_panneau`, `fin_tour` ;
+- inventaire : `numero_bit`, `liste_bits`, `marque_en_service`, `marque_objet`, `eau_benite_case`, `utilise_objet` (règles d'un clic sur un objet ; déclarée comme routine dans `symboles.txt` le 27 novembre 2026, c'était un bloc de `inventaire_sorts`). Reste de l'inventaire, encore généré : l'écran (`inventaire_sorts`, `dessine_objets`, `barre_texte`), le choix d'un sort et le génie, la trousse à outils (`piege_case`).
 
 Les bogues de l'original rencontrés en route sont dans [bogues-reecriture.md](../original/notes/bogues-reecriture.md) : le code lisible les reproduit.
 
@@ -98,7 +100,9 @@ GENERE=1 node essai.mjs 5 gen.png "…"        # le même parcours avec le code 
 
 `lisible.mjs` mène d'abord le jeu jusqu'au plateau de la 1re quête, puis tire au hasard la graine, les fiches, le monstre visé, l'état du tour et les alentours du héros (murs, portes, occupants, zones), avec des scénarios ciblés (voie libre, piège caché, téléport du château, pièce tournante). Il compare toute la mémoire (données, écran, images), sauf la pile. Les boîtes de message et les attentes de clic reçoivent des clics simulés (droit, ou gauche sur OUI), réglés sur le nombre de lectures de la souris et non sur le temps, qui diffère de quelques instructions entre les deux versions.
 
-Au 18 novembre 2026 : les 25 routines sont identiques sur 100 cas chacune (seconde attaque du poison d'orc, pas réussis, portes, pièges cachés et téléport du château couverts), et un parcours avec lancer de dés, clics sur le plateau et sur les 4 flèches donne la même image qu'avec le code généré seul.
+Le champ `fin` d'une routine peut être une liste d'adresses : `utilise_objet` finit vers la page d'objets, sa boucle, ou la fermeture de l'inventaire.
+
+Au 27 novembre 2026 : les 6 routines de l'inventaire sont identiques sur 100 cas chacune, et `utilise_objet` sur 600 cas (toutes les règles couvertes : refus de Sir Ragnar, bouclier et hache, potion déjà bue, héroïque, curative, eau bénite qui tue ou gaspillée, trousse à outils, sorts). Au 18 novembre 2026 : les 25 routines sont identiques sur 100 cas chacune (seconde attaque du poison d'orc, pas réussis, portes, pièges cachés et téléport du château couverts), et un parcours avec lancer de dés, clics sur le plateau et sur les 4 flèches donne la même image qu'avec le code généré seul.
 
 ## État de la partie
 

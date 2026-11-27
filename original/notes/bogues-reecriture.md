@@ -37,3 +37,13 @@ Comportements du code de 1991 trouvés en réécrivant les routines dans `web/je
 | `tour_personnage` | Le réveil passe par `tirage_deplacement` avec 1 dé : le joueur doit cliquer pour arrêter le dé, et c'est `deplacement_restant` = 6 qui réveille. Le nombre de dés du tour est gardé par un `push` du mot DS:3FC4, qui sauve et remet aussi l'octet DS:3FC5. | |
 | `tour_personnage` | `fin_du_tour` n'est pas remis à 0 par `tour_personnage` mais par `des_deplacement_tour`, appelée au début du tour : une fiche vide (+0 = 0) sort avant, sans toucher à la fin du tour. | |
 | `action_sort` (0x2C74) | Hors du tour, relevé en passant : `test byte ptr [0x3f9b], 0` en 0x2C93 teste un masque nul : le `je` qui suit est toujours pris, et le test suivant (`attaque_repetee` bit 2, puis sa mise à 1) n'est jamais atteint. | |
+
+## Inventaire
+
+| Routine | Constat | Note à revoir |
+| --- | --- | --- |
+| `marque_en_service` (0x9661) | `marque_objet` réutilise CX, le compteur de la boucle, et le rend à sa valeur à elle : après un objet trouvé à la place k de la liste, il ne reste que 11 - k tours ; si l'objet en service n'est pas dans la liste, CX vaut 0 et la boucle repart pour 65 535 tours (sans effet, les bits sont épuisés). Un objet en service placé en fin de liste peut donc empêcher de marquer ceux des bits suivants. | |
+| `utilise_objet` (0x92C8), potion héroïque | L'icône d'attaque se rallume, mais le bit « action faite » de `etat_action` (DS:3F9B bit 8) est inversé (`xor`) au lieu d'être effacé : bue avant d'avoir agi, la potion marque l'action comme faite. Si l'icône est déjà allumée, la potion est bue et reste en cours (+0x17 bit 0x40). | 03-regles.md : « le héros attaque deux fois » |
+| `utilise_objet`, eau bénite | Seules les 30 premières cases de `ordre_cases_vue` autour du coin de la zone sont regardées, pas toute la pièce. Le nombre de morts est écrit comme un seul chiffre dans le message : 10 morts afficheraient « : ». | 03-regles.md : « de la pièce » |
+| `utilise_objet`, potion curative | Boire une curative efface toutes les autres potions en cours (+0x17 ne garde que le bit de la curative, qui n'y est jamais posé). | 03-regles.md le dit déjà |
+| `utilise_objet`, armes | Lâcher l'arme en main écrit un mot nul en +0x11 : les artefacts en service (+0x12) sont effacés avec elle. | 03-regles.md le dit déjà |

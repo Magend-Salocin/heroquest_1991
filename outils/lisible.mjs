@@ -28,6 +28,17 @@ const CURSEUR_SUR_LES_ZONES = new Set(['zone_panneau', 'clic_tour', 'commandes_t
 const SPRITES_HEROS = [0x4bc6, 0x4bdd, 0x4bf4, 0x4c0b, 0x4cf1];
 // Registres d'entrée propres à une routine (tirés dans preparerCas, mêmes dans les deux versions).
 const octetDS = (cas, offset, valeur) => { cas.memoire[DS * 16 + offset] = valeur; };
+const lireOctetDS = (cas, offset) => cas.memoire[DS * 16 + offset];
+// Un monstre existant sur une des 30 premières cases vues depuis le coin de la zone (DS:3FE0),
+// devenu squelette, zombi ou momie, et le héros courant dans la zone de cette case.
+const placerMortVivant = (cas) => {
+  const caseZones = 0x546f + lireOctetDS(cas, 0x3fe1) * 26 + lireOctetDS(cas, 0x3fe0) + lireOctetDS(cas, 0x49d6 + alea(30));
+  const numero = 1 + alea(6);                               // monstres de la 1re quête
+  octetDS(cas, caseZones + 0x400, numero);
+  octetDS(cas, 0x4d4a + 10 * (numero - 1) + 8, 4 + alea(3));
+  const fiche = lireOctetDS(cas, 0x4637) | (lireOctetDS(cas, 0x4638) << 8);
+  octetDS(cas, fiche + 3, lireOctetDS(cas, caseZones) & 0x3f);
+};
 // Bouton gauche enfoncé (DS:3992 bit 0x10), pas de piège ni de pas en file la plupart du temps.
 const clicEnCours = (cas) => {
   octetDS(cas, 0x3992, alea(4) ? 0x10 : alea(256));
@@ -38,6 +49,21 @@ const ENTREES = {
   commandes_tour: clicEnCours,
   fin_tour: (cas) => {
     if (alea(4)) { octetDS(cas, 0x3fc8, 0); octetDS(cas, 0x3fc2, 0); }
+  },
+  // Page d'objets : BX zone cliquée (2 à 24), 12 objets au hasard (numéro × 2, bit 0x80 en
+  // service, FFFFh vide), personnage courant (4 : Sir Ragnar), icône d'attaque allumée ou non.
+  // Une fois sur deux, un mort-vivant sur une des 30 premières cases vues, dans la zone du héros
+  // (eau bénite).
+  utilise_objet: (cas) => {
+    cas.etat.bx = 2 * (1 + alea(12));
+    for (let n = 0; n < 12; n++) {
+      const objet = alea(4) === 0 ? 0xffff : (2 * alea(36)) | (alea(3) === 0 ? 0x80 : 0);
+      octetDS(cas, 0xad6a + 2 * n, objet & 0xff);
+      octetDS(cas, 0xad6b + 2 * n, objet >> 8);
+    }
+    octetDS(cas, 0x3fa7, alea(5) === 0 ? 4 : alea(4));
+    octetDS(cas, 0x4289, alea(2) ? 0x0b : 1);
+    if (alea(2)) placerMortVivant(cas);
   },
   // AL numéro du personnage, AH type de commande (souris), BX sa fiche, DX son sprite.
   // Sur le plateau de la 1re quête, seul Sigmar (fiche 0) joue : les autres fiches sont vides.
@@ -227,7 +253,8 @@ function executer(table, adresse, fin, { etat, memoire, clicGauche, souris }) {
     // sur le bouton OUI des questions, et clics gauche et droit alternent.
     sequenceBoutons = clicGauche ? [0, 1, 0, 2] : [0, 2];
     lectures = 0;
-    while (ip !== RETOUR && ip !== fin) {
+    const fins = new Set([].concat(fin ?? []));    // fin : une adresse ou une liste
+    while (ip !== RETOUR && !fins.has(ip)) {
       if (m.t > t + LIMITE) { erreur = 'trop long'; break; }
       const f = table[ip];
       if (!f) throw new Error(`IP ${ip.toString(16)} hors du code`);

@@ -19,6 +19,7 @@ import { Hasard } from './hasard.js';
 import { Combat } from './combat.js';
 import { Deplacement } from './deplacement.js';
 import { Tour } from './tour.js';
+import { Inventaire, numeroBit } from './inventaire.js';
 import { Fiche } from './donnees.js';
 
 // Adresse de retour réservée : le segment de code de QUEST s'arrête à 0x97C0.
@@ -30,7 +31,8 @@ const octetBas = (registre, valeur) => (registre & 0xff00) | (valeur & 0xff);
 //   cout   : instructions comptées pour le temps du jeu (moyenne de la version générée ;
 //            pour une routine par étapes, à chaque reprise, hors routines appelées)
 //   sortie : registres rendus aux appelants, comparés par outils/lisible.mjs ('al' = octet bas seul)
-//   fin    : routine qui se termine par un saut : l'adresse où elle finit (pour la comparaison)
+//   fin    : routine qui se termine par un saut : l'adresse où elle finit, ou la liste des adresses
+//            possibles (pour la comparaison)
 export const ROUTINES_QUEST = {
   0x3613: {
     nom: 'hasard', cout: 17, sortie: ['ax'],
@@ -221,6 +223,53 @@ export const ROUTINES_QUEST = {
     nom: 'fin_tour', cout: 12, sortie: [], etapes: true,
     executer: ({ tour }) => tour.finTour(),
   },
+
+  // ---- Inventaire (inventaire.js)
+  0x45ab: {
+    nom: 'numero_bit', cout: 11, sortie: ['ax', 'cx'],
+    // Entrée AL. Sortie AL = AH = numéro du premier bit posé, ou AX = 0.
+    executer(jeu, m) {
+      const bits = m.ax & 0xff;
+      const numero = numeroBit(bits);
+      m.ax = bits ? (numero << 8) | numero : 0;
+    },
+  },
+  0x9652: {
+    nom: 'liste_bits', cout: 40, sortie: ['ax', 'bx', 'cx', 'si'],
+    // Entrée AL bits, CX nombre, BX premier numéro d'objet, SI place dans la liste.
+    executer({ inventaire }, m) {
+      const r = inventaire.listerBits(m.ax & 0xff, m.cx, m.bx, m.si);
+      Object.assign(m, { si: r.place, bx: r.numero, cx: 0, ax: octetBas(m.ax, r.bits) });
+    },
+  },
+  0x9661: {
+    nom: 'marque_en_service', cout: 60, sortie: ['ax', 'cx', 'si', 'di'],
+    // Entrée AL bits en service, CX nombre, SI premier numéro d'objet ; DI laissé par marque_objet.
+    executer({ inventaire }, m) {
+      const r = inventaire.marquerEnService(m.ax & 0xff, m.cx, m.si, m.di);
+      Object.assign(m, { si: r.numero, di: r.place, cx: 0, ax: octetBas(m.ax, r.bits) });
+    },
+  },
+  0x9670: {
+    nom: 'marque_objet', cout: 51, sortie: ['cx', 'di'],
+    // Entrée SI numéro d'objet. Sortie DI place atteinte, CX reste du compteur.
+    executer({ inventaire }, m) {
+      const r = inventaire.marquerObjet(m.si);
+      Object.assign(m, { di: r.place, cx: r.reste });
+    },
+  },
+  0x94f7: {
+    nom: 'eau_benite_case', cout: 9, sortie: [], etapes: true,
+    // Entrée BX : la case dans grille_zones. Finit par un saut vers retire_monstre quand elle tue.
+    executer: ({ inventaire }, m) => inventaire.eauBeniteCase(m.bx),
+  },
+  // Atteinte par un saut depuis la page d'objets (BX zone cliquée) ; finit par un saut vers la page
+  // ou la boucle des objets, ou passe par le choix d'un sort ou la trousse à outils, qui finissent
+  // par fermer l'inventaire ou par revenir à la page.
+  0x92c8: {
+    nom: 'utilise_objet', cout: 20, sortie: [], etapes: true, fin: [0x90e7, 0x91e2, 0x8f5d],
+    executer: ({ inventaire }, m) => inventaire.utiliserObjet(m.bx),
+  },
 };
 
 // Remplace, dans la table des routines générées, l'entrée de chaque routine réécrite.
@@ -278,5 +327,6 @@ export function creerJeu(machine) {
   jeu.combat = new Combat(jeu);
   jeu.deplacement = new Deplacement(jeu);
   jeu.tour = new Tour(jeu);
+  jeu.inventaire = new Inventaire(jeu);
   return jeu;
 }

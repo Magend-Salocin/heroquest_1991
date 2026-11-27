@@ -275,6 +275,11 @@
 0x9670  code  marque_objet           pose le bit 0x80 de l'entrée SI dans liste_objets
 0x9527  code  dessine_objets         dessine les 12 cases, et le cadre 0xA280 sur les objets en service
 0x95d6  code  barre_texte            bandeau de texte en (32, 169)
+0x92c8  code  utilise_objet          clic sur un objet de l'inventaire (BX = zone cliquée) : règle de l'objet selon son champ de fiche (objets_champs) ; atteinte par un saut depuis inventaire_sorts, finit par un saut vers page_objets
+0x90e7  etiq  page_objets            refait la liste des objets de la page (mode_inventaire), la dessine, puis boucle_objets
+0x91e2  etiq  boucle_objets          boucle de la page d'objets : nom sous le curseur, clics
+0x8f5d  etiq  ferme_inventaire       ferme l'inventaire : recharge BOOK et MAPS, puis fin_action
+0x9685  etiq  choix_sort             sort choisi (+0x16, AL) ; le génie ouvre son menu
 0x9313  etiq  choix_armure           +0x13 ; bouclier refusé avec la hache d'armes
 0x936a  etiq  choix_arme             +0x11 : une seule arme ; la trousse à outils désarme un piège
 0x93bb  etiq  choix_artefact         +0x12

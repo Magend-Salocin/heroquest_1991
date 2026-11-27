@@ -22,7 +22,7 @@ Règles communes, déjà rappelées dans chaque prompt :
 | 2 | Inspecteur | 27 novembre 2026 |
 | 3 | Dossier `cours/` et leçon 1 (hasard et dés) | 27 novembre 2026 |
 | 4 | Leçons du code déjà réécrit | 27 novembre 2026 |
-| 5 | Boucle : réécrire un sous-système, puis sa leçon | à répéter |
+| 5 | Boucle : réécrire un sous-système, puis sa leçon | à répéter ; 1 (objets) commencé le 27 novembre 2026 : règles faites, écran de l'inventaire à faire |
 | 6 | Prompts des graphismes | |
 | 7 | Script de découpe des planches | |
 | 8 | Vue moderne : plateau en lecture seule | |

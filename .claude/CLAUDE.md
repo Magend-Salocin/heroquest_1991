@@ -52,8 +52,8 @@ Toutes depuis `outils/`, sauf le serveur. Prérequis : Python 3.10+ (`pillow cap
 
 Sur Windows, la sortie console de Python est en cp1252 : les accents apparaissent mal dans le terminal, les fichiers écrits sont corrects.
 
-## État (20 novembre 2026)
+## État (27 novembre 2026)
 
-Phases 0 à 2 faites, le jeu se joue dans le navigateur (phase 3). En cours : réécriture lisible (30 routines de QUEST.EXE sur 379 : hasard, combat, déplacement, tour d'un personnage). Prochaines étapes dans [ROADMAP.md](../ROADMAP.md), section « Reste » des phases 3 et 4.
+Phases 0 à 2 faites, le jeu se joue dans le navigateur (phase 3). En cours : réécriture lisible (36 routines de QUEST.EXE sur 380 : hasard, combat, déplacement, tour d'un personnage, objets de l'inventaire) et phase 5 (cours dans `cours/`, inspecteur, vue moderne : [plan](../docs/PLAN-cours-vue-moderne.md)). Prochaines étapes dans [ROADMAP.md](../ROADMAP.md), section « Reste » des phases 3 et 4.
 
 Skill du projet : `/reecrire-routine` pour la réécriture lisible d'une routine.
