@@ -26,7 +26,7 @@ Règles communes, déjà rappelées dans chaque prompt :
 | 6 | Prompts des graphismes | 27 novembre 2026 |
 | 7 | Script de découpe des planches | 27 novembre 2026 |
 | 8 | Vue moderne : plateau en lecture seule | 27 novembre 2026 |
-| 9 | Vue moderne : bascule et interface | |
+| 9 | Vue moderne : bascule et interface | 27 novembre 2026 |
 | 10 | Vue moderne : commandes | |
 | 11 | Vue moderne : graphismes définitifs | |
 

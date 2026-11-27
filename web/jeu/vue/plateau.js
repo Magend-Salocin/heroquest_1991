@@ -1,4 +1,4 @@
-// Vue moderne du plateau (index.html?vue=moderne) : un rendu isométrique sur un canvas séparé,
+// Vue moderne du plateau : un rendu isométrique sur un canvas séparé,
 // qui ne fait que lire l'état de la partie (etat.js) à chaque image. Le jeu d'origine continue
 // de tourner et de recevoir les clics sur son propre écran ; les règles et les dés sont les siens.
 //
@@ -10,8 +10,15 @@
 //
 // Images : web/vue/images/atlas.png et atlas.json (outils/decouper-planches.py) s'ils existent ;
 // sinon, ou pour une image absente de l'atlas, des formes simples.
+//
+// Bascule : bouton « Vue » ou touche F9 ; le choix est gardé dans le navigateur. index.html?vue=moderne
+// et ?vue=origine forcent le choix sans le garder. La vue moderne ne remplace que le plateau, pendant
+// une partie (phaseDuJeu) ; l'inventaire, les menus et les autres écrans restent ceux d'origine.
+// Autour du plateau : fiches des héros, tour en cours, dés, journal des messages.
 
 import { lireEtat, LARGEUR, HAUTEUR } from './etat.js';
+import { phaseDuJeu } from './pile.js';
+import { lireMessage, journaliserMessages } from './messages.js';
 
 const LARGEUR_CASE = 64;
 const HAUTEUR_CASE = 32;
@@ -23,6 +30,12 @@ const ATLAS = 'vue/images/atlas';
 const TYPES_HEROS = ['barbare', 'nain', 'elfe', 'enchanteur'];
 const IMAGES_MONSTRES = ['gobelin', 'orc', 'brute', 'guerrier-noir', 'squelette', 'zombi', 'momie', 'gargouille', 'chef-orc', 'chef-orc', 'chef-orc', 'sorcier-trone'];
 const COULEURS_HEROS = ['#c0392b', '#d68910', '#27ae60', '#2e86c1', '#aaa'];
+const NOMS_HEROS = ['Barbare', 'Nain', 'Elfe', 'Enchanteur', 'Sir Ragnar'];
+const PORTRAITS = 'vue/images/portraits';
+const CLE_VUE = 'heroquest-vue';             // localStorage : 'moderne' ou 'origine'
+const TAILLE_JOURNAL = 6;
+const PERIODE_PANNEAU_MS = 100;
+const IMAGES_STABLES = 3;                  // images concordantes avant de changer d'écran (pile estimée)
 
 const COULEUR = {
   fond: '#0b0d12',
@@ -53,16 +66,65 @@ async function chargerAtlas() {
   }
 }
 
-export function creerVueModerne(conteneur) {
+function lireChoix(options) {
+  const force = options.get('vue');
+  if (force === 'moderne' || force === 'origine') return force;
+  try { return localStorage.getItem(CLE_VUE) === 'moderne' ? 'moderne' : 'origine'; } catch { return 'origine'; }
+}
+
+function garderChoix(choix) {
+  try { localStorage.setItem(CLE_VUE, choix); } catch { /* stockage indisponible : choix pour cette page seulement */ }
+}
+
+function element(parent, balise, classe, texte) {
+  const e = document.createElement(balise);
+  if (classe) e.className = classe;
+  if (texte !== undefined) e.textContent = texte;
+  parent.append(e);
+  return e;
+}
+
+export function creerVueModerne(conteneur, options) {
   const feuille = document.createElement('link');
   feuille.rel = 'stylesheet';
   feuille.href = new URL('./plateau.css', import.meta.url).href;
   document.head.append(feuille);
-  document.body.classList.add('vue-moderne');
 
-  const canvas = document.createElement('canvas');
+  const cadre = document.createElement('div');
+  cadre.id = 'vue-moderne-cadre';
+  conteneur.prepend(cadre);
+  const canvas = element(cadre, 'canvas');
   canvas.id = 'vue-moderne';
-  conteneur.prepend(canvas);
+  const panneau = element(cadre, 'aside');
+  panneau.id = 'panneau-moderne';
+  const titreTour = element(panneau, 'p', 'tour');
+  const fiches = element(panneau, 'div', 'fiches');
+  const des = element(panneau, 'p', 'des');
+  element(panneau, 'h2', null, 'Messages');
+  const journal = element(panneau, 'ol', 'journal');
+  const bouton = element(conteneur, 'button', null);
+  bouton.id = 'bascule-vue';
+  bouton.type = 'button';
+
+  let choix = lireChoix(options);
+  const afficherChoix = () => {
+    document.body.classList.toggle('vue-moderne', choix === 'moderne');
+    bouton.textContent = choix === 'moderne' ? "Vue d'origine (F9)" : 'Vue moderne (F9)';
+  };
+  afficherChoix();
+  const basculer = () => {
+    choix = choix === 'moderne' ? 'origine' : 'moderne';
+    garderChoix(choix);
+    afficherChoix();
+  };
+  bouton.addEventListener('click', basculer);
+
+  const messages = [];
+  let machineSuivie = null;
+  let dernierPanneau = 0;
+  let ecranAffiche = 'autre';
+  let ecranVu = 'autre';
+  let imagesConcordantes = 0;
   const ctx = canvas.getContext('2d');
   let atlas = null;
   chargerAtlas().then((a) => { atlas = a; });
@@ -266,13 +328,68 @@ export function creerVueModerne(conteneur) {
     ctx.restore();
   }
 
+  // ---- Panneau : tour, fiches, dés, journal
+
+  const pluriel = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
+
+  function remplirPanneau(etat, phase) {
+    const courant = etat.heros.find((h) => h.numero === etat.personnageCourant);
+    titreTour.textContent = phase.tour === 'monstres' ? 'Tour de Morcar' : `Tour : ${courant ? NOMS_HEROS[courant.type] ?? '?' : '?'}`;
+
+    fiches.replaceChildren();
+    for (const h of etat.heros) {
+      const fiche = element(fiches, 'div', h.numero === etat.personnageCourant && phase.tour === 'heros' ? 'fiche courante' : 'fiche');
+      const type = TYPES_HEROS[h.type];
+      if (type) {
+        const portrait = element(fiche, 'img');
+        portrait.src = `${PORTRAITS}/${type}-h.png`;
+        portrait.alt = '';
+      }
+      element(fiche, 'strong', null, NOMS_HEROS[h.type] ?? `Personnage ${h.numero}`);
+      element(fiche, 'span', 'valeurs', `Corps ${h.pointsCorps} · Esprit ${h.pointsEsprit} · Att. ${h.desAttaque} · Déf. ${h.desDefense} · Or ${h.or}`);
+    }
+
+    const combat = `Dernier combat : ${pluriel(etat.combat.cranes, 'crâne')}, ${pluriel(etat.combat.boucliers, 'bouclier')}`;
+    des.textContent = phase.tour === 'heros'
+      ? `Déplacement : ${pluriel(etat.deplacementRestant, 'case')} (${pluriel(etat.desDeplacement, 'dé')}) · ${combat}`
+      : combat;
+
+    journal.replaceChildren();
+    for (const texte of messages) element(journal, 'li', null, texte);
+  }
+
+  function noterMessage(m, numero) {
+    const lignes = lireMessage(m, numero).filter(Boolean);
+    if (!lignes.length) return;
+    const texte = lignes.join(' ');
+    if (messages[0] === texte) return;              // même boîte réaffichée
+    messages.unshift(texte);
+    messages.length = Math.min(messages.length, TAILLE_JOURNAL);
+  }
+
   return {
+    basculer,
     mettreAJour(m, programme) {
       if (programme !== 'QUEST') { document.body.classList.remove('plateau-actif'); return; }
+      if (machineSuivie !== m) {
+        machineSuivie = m;
+        journaliserMessages(m, (numero) => noterMessage(m, numero));
+      }
+      if (choix !== 'moderne') { document.body.classList.remove('plateau-actif'); return; }
+      const phase = phaseDuJeu(m);
       const etat = lireEtat(m);
-      const surLePlateau = etat.heros.length > 0 && etat.plateau.cases.some((c) => c.vue);
+      // La phase vient d'une pile estimée : un mot isolé peut tromper une image ; on attend qu'elle se confirme.
+      if (phase.ecran === ecranVu) imagesConcordantes++; else { ecranVu = phase.ecran; imagesConcordantes = 1; }
+      if (imagesConcordantes >= IMAGES_STABLES) ecranAffiche = ecranVu;
+      const surLePlateau = ecranAffiche === 'plateau' && etat.heros.length > 0 && etat.plateau.cases.some((c) => c.vue);
       document.body.classList.toggle('plateau-actif', surLePlateau);
-      if (surLePlateau) dessiner(etat);
+      if (!surLePlateau) return;
+      dessiner(etat);
+      const maintenant = performance.now();
+      if (maintenant - dernierPanneau >= PERIODE_PANNEAU_MS) {
+        dernierPanneau = maintenant;
+        remplirPanneau(etat, phase);
+      }
     },
   };
 }

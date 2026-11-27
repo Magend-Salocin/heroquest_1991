@@ -108,7 +108,7 @@ Autre détail : `finDuTour` n'est pas remis à 0 par le tour, mais par le calcul
 
 ## Exercices
 
-1. **Observer.** Dans l'inspecteur, regarder la colonne « personnage » de l'en-tête et la ligne jaune des héros pendant une partie à plusieurs héros. Que montre l'inspecteur pendant le tour de Morcar ? (Indice : il ne le dit pas encore ; pourquoi ? Voir [ROADMAP.md](../ROADMAP.md), étape 1 de la phase 5.)
+1. **Observer.** Dans l'inspecteur, regarder la colonne « personnage » de l'en-tête et la ligne jaune des héros pendant une partie à plusieurs héros. Que montre l'inspecteur pendant le tour de Morcar ? Aucune variable de la mémoire ne le dit : l'inspecteur le déduit de la pile d'appels ([vue/pile.js](../web/jeu/vue/pile.js), `phaseDuJeu`). Pourquoi cette méthode peut-elle se tromper sur une image isolée ?
 
 2. **Écrire une recherche de zone.** Écrire `zoneSous(zones, x, y)` qui prend un tableau d'objets `{ x1, x2, y1, y2, action }` et rend l'action de la première zone qui contient le point, ou `null`. L'essayer avec deux zones qui se chevauchent : laquelle gagne ? Pourquoi l'ordre de la table compte-t-il ?
 

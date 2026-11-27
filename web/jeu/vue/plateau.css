@@ -1,12 +1,36 @@
 /* Vue moderne (vue/plateau.js). Hors du plateau, l'écran d'origine garde sa place. Sur le plateau,
-   la vue moderne prend la place principale et l'écran d'origine passe en petit, en haut à droite,
-   toujours jouable. */
-#vue-moderne { display: none; }
-body.vue-moderne.plateau-actif main { position: relative; width: min(96vw, 160vh); }
+   la vue moderne prend la place principale, avec son panneau à droite (en dessous en portrait),
+   et l'écran d'origine passe en petit dans le coin du plateau, toujours jouable. */
+#vue-moderne-cadre { display: none; }
+#bascule-vue { justify-self: center; }
+
+body.vue-moderne.plateau-actif main { position: relative; width: min(98vw, 170vh); }
+body.vue-moderne.plateau-actif #vue-moderne-cadre {
+  display: grid; grid-template-columns: minmax(0, 1fr) 16em; gap: 8px; width: 100%;
+}
 body.vue-moderne.plateau-actif #vue-moderne {
   display: block; width: 100%; aspect-ratio: 16 / 10; background: #0b0d12; border-radius: 6px;
 }
 body.vue-moderne.plateau-actif #ecran {
-  position: absolute; top: 8px; right: 8px; width: min(32vw, 400px); z-index: 1;
+  position: absolute; top: 8px; left: 8px; width: min(28vw, 360px); z-index: 1;
   border: 1px solid #555; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+#panneau-moderne { font: 13px/1.4 sans-serif; color: #ccc; overflow-y: auto; max-height: calc(min(98vw, 170vh) * 10 / 16); }
+#panneau-moderne h2 { font-size: 13px; color: #fff; margin: 10px 0 4px; }
+#panneau-moderne .tour { margin: 0 0 6px; font-weight: bold; color: #fff; }
+#panneau-moderne .fiches { display: grid; gap: 6px; }
+#panneau-moderne .fiche { display: grid; grid-template-columns: 40px 1fr; column-gap: 8px; align-items: center;
+  padding: 4px; border: 1px solid #333; border-radius: 6px; }
+#panneau-moderne .fiche.courante { border-color: #e0b040; background: rgba(224, 176, 64, 0.08); }
+#panneau-moderne .fiche img { grid-row: span 2; width: 40px; height: 56px; object-fit: contain; }
+#panneau-moderne .fiche .valeurs { font-size: 12px; color: #aaa; }
+#panneau-moderne .des { margin: 8px 0 0; }
+#panneau-moderne .journal { margin: 0; padding-left: 1.4em; font-size: 12px; }
+#panneau-moderne .journal li:first-child { color: #fff; }
+
+@media (orientation: portrait), (max-width: 700px) {
+  body.vue-moderne.plateau-actif #vue-moderne-cadre { grid-template-columns: 1fr; }
+  body.vue-moderne.plateau-actif #ecran { width: 40vw; }
+  #panneau-moderne { max-height: none; }
 }

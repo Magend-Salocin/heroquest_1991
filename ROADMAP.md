@@ -88,7 +88,7 @@ But : se servir du jeu pour enseigner la programmation, et proposer une seconde 
 
 | Étape | Sujet | État |
 | --- | --- | --- |
-| 1 | Couche d'état lisible (`web/jeu/vue/etat.js`) | faite le 27 novembre 2026 ; reste à identifier la variable qui distingue le tour des héros de celui des monstres |
+| 1 | Couche d'état lisible (`web/jeu/vue/etat.js`) | faite le 27 novembre 2026 ; le tour des héros ou de Morcar et l'écran en cours se lisent dans la pile d'appels (`vue/pile.js`) |
 | 2 | Inspecteur (`?inspecteur=1`) | fait le 27 novembre 2026 |
 | 3 | Dossier `cours/` et leçon 1 (hasard et dés) | fait le 27 novembre 2026 |
 | 4 | Leçons du code déjà réécrit (routines par étapes, combat, déplacement, tour) | fait le 27 novembre 2026 (leçons 2 à 5) |
@@ -96,7 +96,7 @@ But : se servir du jeu pour enseigner la programmation, et proposer une seconde 
 | 6 | Prompts des graphismes (`docs/prompts-interface.md`) | fait le 27 novembre 2026 ; planches à générer |
 | 7 | Script de découpe des planches | fait le 27 novembre 2026 (`outils/decouper-planches.py`, `outils/planches.json`) |
 | 8 | Vue moderne : plateau en lecture seule | fait le 27 novembre 2026 (`?vue=moderne`, formes simples en attendant les planches) |
-| 9 | Vue moderne : bascule et interface | à faire |
+| 9 | Vue moderne : bascule et interface | fait le 27 novembre 2026 (bouton et F9, panneau des héros, dés, journal des messages ; reste un essai sur téléphone) |
 | 10 | Vue moderne : commandes | à faire |
 | 11 | Vue moderne : graphismes définitifs | à faire |
 

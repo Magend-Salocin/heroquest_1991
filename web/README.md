@@ -21,7 +21,7 @@ Un seul affichage, le VGA, et un seul son, l'AdLib. La page fournit `QUEST.CFG` 
 | `index.html?paquet`, `?paquet=URL`, `?importer` | ignore le serveur PHP et utilise le paquet de l'appareil ; l'importe depuis une adresse ; propose d'en importer un autre |
 | `index.html?tactile`, `?sans-tactile` | force ou masque les commandes tactiles (affichées d'office sur un écran tactile) |
 | `index.html?inspecteur` | panneau qui montre la partie telle que le code la voit (voir « Inspecteur ») |
-| `index.html?vue=moderne` | plateau dessiné en isométrique, l'écran d'origine en petit (voir « Vue moderne ») |
+| `index.html?vue=moderne`, `?vue=origine` | force la vue moderne du plateau ou l'écran d'origine, sans garder le choix ; sinon le choix gardé (bouton, F9), d'origine par défaut (voir « Vue moderne ») |
 
 Le jeu dessine son propre curseur. Clavier : positions physiques du PC (voir `jeu/clavier.js`) ; Ctrl quitte.
 
@@ -117,7 +117,9 @@ La lecture se fait dans le segment de données du jeu (`machine.L + 0x97C`), pas
 | --- | --- |
 | `quete` | numéro de la quête (0 = la 1re) |
 | `graine` | registre du hasard (DS:38FD, 4 octets, le premier en haut) |
-| `personnageCourant` | personnage qui joue, ou qui a joué en dernier (0 à 4) ; aucune variable identifiée ne dit encore si c'est le tour des monstres |
+| `personnageCourant` | personnage qui joue, ou qui a joué en dernier (0 à 4) ; le tour des monstres se lit dans la pile d'appels (`phaseDuJeu`, ci-dessous) |
+| `desDeplacement`, `deplacementRestant` | dés de déplacement du tour, cases qu'il reste à parcourir |
+| `combat` | `cranes`, `boucliers` du dernier combat |
 | `plateau.cases` | 26 × 19 cases, rangées `y × 26 + x` : `zone`, `vue`, `bordVu`, les 4 bords (`haut`, `gauche`, `bas`, `droite` : `mur`, `porte` avec `ouverte` et `secrete`) et `occupant` |
 | `heros` | fiches présentes : `numero`, `type` et `nomType`, `x`, `y`, `zone`, points de corps et d'esprit, dés d'attaque et de défense, `or` |
 | `monstres` | enregistrements non vides : `numero`, `type` et `nomType`, `x`, `y`, `zone`, `vu`, `vivant`, `reveille`, `passeSonTour`, `endormi` |
@@ -130,13 +132,17 @@ Pour l'écrire en JSON à la fin d'un essai (ici au début de la 1re quête) :
 ETAT=etat.json node essai.mjs 5 plateau.png "clic:68:128,attendre:3,clic:160:44,attendre:4,clic:160:180,attendre:4"
 ```
 
+`jeu/vue/pile.js` lit la pile d'appels du programme (`pileAppels`, estimée : les mots de la pile qui suivent un `call` dans le code) et en déduit `phaseDuJeu(machine)` : `ecran` vaut `plateau` pendant une partie (`tour_personnage` ou `tour_morcar` en cours), `inventaire` (`inventaire_sorts`), ou `autre` ; `tour` vaut `heros` ou `monstres`. Aucune variable du segment de données ne donne l'écran : `zones_actives` reste sur le panneau après la fin d'une quête.
+
+`jeu/vue/messages.js` relit le texte d'un message dans le fichier de textes en mémoire (`lireMessage`) et peut noter chaque appel de `affiche_message` (`journaliserMessages`, qui remplace l'entrée de la routine dans la table).
+
 ## Inspecteur
 
 `index.html?inspecteur` (ou `?inspecteur=1`) ajoute un panneau à droite de l'écran du jeu, en dessous sur un écran de moins de 900 px. Il est rafraîchi tous les dixièmes de seconde et ne fait que lire la mémoire. Sans le paramètre, `jeu/vue/inspecteur.js` n'est pas chargé.
 
 | Partie | Contenu |
 | --- | --- |
-| En-tête | quête, personnage courant, routine en cours (nom de `symboles.txt`) et IP |
+| En-tête | quête, personnage courant ou tour de Morcar, routine en cours (nom de `symboles.txt`) et IP |
 | Pile d'appels | estimée : les mots de la pile du programme qui suivent un `call` proche (E8 ou FF /2) dans le code, de la plus récente à la plus ancienne, et les routines lisibles par étapes en cours, marquées « (lisible) ». Une donnée de la pile qui ressemble à une adresse de retour peut s'y glisser |
 | Hasard | nombre de tirages depuis l'ouverture du panneau, dernier tirage (1 à max, résultat, registre avant et après) et registre actuel (DS:38FD). Le suivi passe par `Hasard.observateur` de `jeu/lisible/hasard.js` : avec `?genere`, seul le registre est montré |
 | Héros, monstres vus | fiches présentes (personnage courant en jaune), monstres vus et vivants |
@@ -146,13 +152,12 @@ ETAT=etat.json node essai.mjs 5 plateau.png "clic:68:128,attendre:3,clic:160:44,
 
 ## Vue moderne
 
-`index.html?vue=moderne` charge `jeu/vue/plateau.js` : sur le plateau, un canvas dessine la partie en isométrique (cases de 64 × 32), et l'écran d'origine passe en petit en haut à droite, toujours jouable : pour l'instant, on joue sur lui. La vue moderne ne fait que lire `lireEtat` à chaque image ; les règles et les dés restent ceux du code d'origine (décision D6 de la roadmap).
+Le bouton sous l'écran, ou la touche F9, passe de l'écran d'origine à la vue moderne (`jeu/vue/plateau.js`) ; le choix est gardé dans le navigateur, et `?vue=moderne` ou `?vue=origine` le forcent sans le garder. Pendant une partie, sur le plateau, un canvas dessine la partie en isométrique (cases de 64 × 32), avec à droite (en dessous en portrait) un panneau : tour en cours (héros ou Morcar), fiches des héros avec leur portrait (`vue/images/portraits/`), dés de déplacement et du dernier combat, journal des 6 derniers messages. L'écran d'origine passe en petit dans le coin du plateau, toujours jouable : pour l'instant, on joue sur lui. L'inventaire, les menus et les autres écrans restent ceux d'origine, en grand (`phaseDuJeu`, confirmée sur 3 images de suite). La vue moderne ne fait que lire `lireEtat` à chaque image ; les règles et les dés restent ceux du code d'origine (décision D6 de la roadmap).
 
 - Seuls les murs du fond (bords haut et gauche de chaque case) sont dessinés ; une case dont seul le bord est connu n'a qu'un muret.
 - On ne montre que ce que les héros ont vu : cases vues, monstres vus et vivants, pièges trouvés, portes secrètes ouvertes (une porte secrète cachée est dessinée comme un mur).
 - La caméra suit le personnage courant.
 - Images de l'atlas (`vue/images/atlas.json`) quand il existe ; sinon, ou pour une image absente, des formes simples (losanges, pans de mur, blocs, figurines).
-- Hors du plateau (pas de case vue), l'écran d'origine reprend sa place.
 
 ## Graphismes de la vue moderne
 

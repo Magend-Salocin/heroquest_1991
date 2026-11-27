@@ -7,6 +7,7 @@
 import { Donnees, TABLES, Fiche, Monstre } from '../lisible/donnees.js';
 import { MUR, PORTE } from '../lisible/deplacement.js';
 import { Hasard } from '../lisible/hasard.js';
+import '../lisible/combat.js';                // variables du combat (cranes, boucliers) dans Donnees
 
 export const LARGEUR = 26;
 export const HAUTEUR = 19;
@@ -141,6 +142,9 @@ export function lireEtat(machine) {
     quete: d.numeroQuete,
     personnageCourant: d.personnageCourant,
     graine: new Hasard(d).graine(),          // registre du hasard (DS:38FD), octet a en haut
+    desDeplacement: d.desDeplacement,         // dés de déplacement du tour
+    deplacementRestant: d.deplacementRestant, // cases qu'il reste à parcourir
+    combat: { cranes: d.cranes, boucliers: d.boucliers },   // dés du dernier combat
     plateau: lirePlateau(d),
     heros: lireHeros(d),
     monstres: lireMonstres(d),

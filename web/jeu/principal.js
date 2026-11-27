@@ -15,7 +15,8 @@
 //   index.html?importer     propose d'importer un autre paquet
 //   index.html?tactile, ?sans-tactile   force ou masque les commandes tactiles
 //   index.html?inspecteur   panneau qui montre la partie telle que le code la voit (vue/inspecteur.js)
-//   index.html?vue=moderne  plateau dessiné en isométrique (vue/plateau.js), l'écran d'origine en petit
+//   index.html?vue=moderne  plateau dessiné en isométrique (vue/plateau.js), l'écran d'origine en petit ;
+//                           ?vue=origine force l'écran d'origine ; sinon le choix gardé (bouton, F9)
 
 import { Machine, INSTRUCTIONS_PAR_MS } from './machine.js';
 import { codeClavier, asciiDe } from './clavier.js';
@@ -53,7 +54,7 @@ const image = contexte.createImageData(320, 200);
 let machine = null;                                  // programme en cours, pour les entrées
 let programme = null;
 let inspecteur = null;                               // ?inspecteur : vue/inspecteur.js
-let vueModerne = null;                               // ?vue=moderne : vue/plateau.js
+let vueModerne = null;                               // vue/plateau.js (bouton, F9, ?vue=)
 
 // ---- Sources des données
 
@@ -225,6 +226,11 @@ function brancherEntrees() {
 
   window.addEventListener('keydown', (e) => {
     if (e.target.id === 'saisie') return;            // clavier de l'appareil : voir tactile.js
+    if (e.code === 'F9') {                           // bascule vue d'origine / vue moderne (vue/plateau.js)
+      e.preventDefault();
+      if (!e.repeat) vueModerne?.basculer();
+      return;
+    }
     const code = codeClavier(e.code);
     if (!machine || code === undefined) return;
     e.preventDefault();
@@ -326,10 +332,8 @@ async function demarrer() {
     const { creerInspecteur } = await import('./vue/inspecteur.js');
     inspecteur = creerInspecteur(document.querySelector('main'));
   }
-  if (OPTIONS.get('vue') === 'moderne') {
-    const { creerVueModerne } = await import('./vue/plateau.js');
-    vueModerne = creerVueModerne(document.querySelector('main'));
-  }
+  const { creerVueModerne } = await import('./vue/plateau.js');
+  vueModerne = creerVueModerne(document.querySelector('main'), OPTIONS);
   etat.textContent = '';
 
   donnees.fichiers.set('QUEST.CFG', configuration(donnees.fichiers.get('QUEST.CFG')));

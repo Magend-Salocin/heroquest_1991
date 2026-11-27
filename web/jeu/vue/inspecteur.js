@@ -5,63 +5,11 @@
 
 import { lireEtat, LARGEUR, HAUTEUR } from './etat.js';
 import { Hasard } from '../lisible/hasard.js';
-import { QUEST } from '../lisible/adresses.gen.js';
-import { RETOUR_LISIBLE } from '../lisible/routines.js';
+import { routineEnCours, pileAppels, phaseDuJeu } from './pile.js';
 
 const PERIODE_MS = 100;            // rafraîchissement du panneau
 const CASE_PX = 8;                 // taille d'une case dans les grilles
-const PROFONDEUR_PILE = 256;       // mots de pile lus au plus
-const NOMS = Object.fromEntries(Object.entries(QUEST).map(([nom, adresse]) => [adresse, nom]));
 const hex = (n, chiffres = 4) => n.toString(16).padStart(chiffres, '0');
-
-// ---- Routines et pile d'appels
-
-// Nom de la routine qui contient ip : le code généré range une même fonction sur toute la plage
-// de la routine (nom_adresse) ; une routine réécrite n'occupe que son adresse d'entrée.
-function nomRoutine(m, ip) {
-  if (NOMS[ip]) return NOMS[ip];
-  const nom = m.table[ip]?.name;
-  const generee = nom && /^(.+)_[0-9a-f]+$/.exec(nom);
-  return generee ? generee[1] : `0x${hex(ip)}`;
-}
-
-// Le mot de pile est-il l'adresse de retour d'un call proche ? On regarde l'instruction qui la
-// précède : E8 (call rel16) ou FF /2 (call indirect, selon l'adressage).
-function estRetourDAppel(m, retour) {
-  const octet = (recul) => m.rb(m.cs, (retour - recul) & 0xffff);
-  const appelIndirect = (recul, modes) => {
-    const modrm = octet(recul - 1);
-    return octet(recul) === 0xff && (modrm & 0x38) === 0x10 && modes(modrm >> 6, modrm & 7);
-  };
-  return octet(3) === 0xe8
-    || appelIndirect(2, (mod, rm) => mod === 3 || (mod === 0 && rm !== 6))
-    || appelIndirect(3, (mod) => mod === 1)
-    || appelIndirect(4, (mod, rm) => mod === 2 || (mod === 0 && rm === 6));
-}
-
-// Routine en cours : celle de ip, ou la routine lisible qui reprend la main (ip = RETOUR_LISIBLE).
-function routineEnCours(m) {
-  if (m.ip === RETOUR_LISIBLE && m.lisibles?.length) return `${m.lisibles.at(-1).routine.nom} (lisible)`;
-  return nomRoutine(m, m.ip);
-}
-
-// Pile d'appels estimée, de la plus récente à la plus ancienne : les adresses de retour trouvées
-// dans la pile du programme, et les routines lisibles en cours. Une routine lisible qui appelle
-// pose RETOUR_LISIBLE juste sous sa propre entrée dans la pile (sp mémorisé par routines.js).
-function pileAppels(m) {
-  const lisibles = new Map((m.lisibles || []).map((l) => [(l.sp - 2) & 0xffff, l.routine.nom]));
-  const appels = [];
-  const fond = m.spDepart ?? 0xfffe;
-  for (let sp = m.sp, n = 0; sp < fond && n < PROFONDEUR_PILE; sp += 2, n++) {
-    const mot = m.rw(m.ss, sp);
-    if (mot === RETOUR_LISIBLE) {
-      appels.push(`${lisibles.get(sp) ?? '?'} (lisible)`);
-    } else if (m.table[mot] && estRetourDAppel(m, mot)) {
-      appels.push(nomRoutine(m, mot));
-    }
-  }
-  return appels;
-}
 
 // ---- Grilles
 
@@ -227,7 +175,9 @@ export function creerInspecteur(conteneur) {
       }
       const etat = lireEtat(m);
       const graine = etat.graine;
-      entete.textContent = `Quête ${etat.quete + 1}, personnage ${etat.personnageCourant} · routine en cours : ${routineEnCours(m)} (IP ${hex(m.ip)})`;
+      const phase = phaseDuJeu(m);
+      const tour = phase.tour === 'monstres' ? 'tour de Morcar' : phase.tour === 'heros' ? `personnage ${etat.personnageCourant}` : phase.ecran;
+      entete.textContent = `Quête ${etat.quete + 1}, ${tour} · routine en cours : ${routineEnCours(m)} (IP ${hex(m.ip)})`;
 
       pile.replaceChildren();
       for (const appel of pileAppels(m)) element(pile, 'li', null, appel);
