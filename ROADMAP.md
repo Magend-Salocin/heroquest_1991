@@ -89,7 +89,7 @@ But : se servir du jeu pour enseigner la programmation, et proposer une seconde 
 | Étape | Sujet | État |
 | --- | --- | --- |
 | 1 | Couche d'état lisible (`web/jeu/vue/etat.js`) | faite le 27 novembre 2026 ; reste à identifier la variable qui distingue le tour des héros de celui des monstres |
-| 2 | Inspecteur (`?inspecteur=1`) | à faire |
+| 2 | Inspecteur (`?inspecteur=1`) | fait le 27 novembre 2026 |
 | 3 | Dossier `cours/` et leçon 1 (hasard et dés) | à faire |
 | 4 | Leçons du code déjà réécrit (routines par étapes, combat, déplacement, tour) | à faire |
 | 5 | Réécrire un sous-système, puis sa leçon (à répéter) | à faire |

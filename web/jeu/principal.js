@@ -14,6 +14,7 @@
 //   index.html?paquet=URL   importe le paquet depuis cette adresse
 //   index.html?importer     propose d'importer un autre paquet
 //   index.html?tactile, ?sans-tactile   force ou masque les commandes tactiles
+//   index.html?inspecteur   panneau qui montre la partie telle que le code la voit (vue/inspecteur.js)
 
 import { Machine, INSTRUCTIONS_PAR_MS } from './machine.js';
 import { codeClavier, asciiDe } from './clavier.js';
@@ -50,6 +51,7 @@ const contexte = ecran.getContext('2d');
 const image = contexte.createImageData(320, 200);
 let machine = null;                                  // programme en cours, pour les entrées
 let programme = null;
+let inspecteur = null;                               // ?inspecteur : vue/inspecteur.js
 
 // ---- Sources des données
 
@@ -268,6 +270,7 @@ async function executer(nom, donnees, son) {
         return;
       }
       afficher(m);
+      if (inspecteur) inspecteur.mettreAJour(m, nom);
       if (OPTIONS.has('debug')) etat.textContent = `${nom} t = ${(m.t / INSTRUCTIONS_PAR_MS / 1000).toFixed(1)} s, IP ${m.ip.toString(16)}`;
       if (m.arret !== null) fini(m.arret);
       else requestAnimationFrame(image_suivante);
@@ -316,6 +319,10 @@ async function demarrer() {
   window.addEventListener('pointerdown', () => son.activer(), { once: true });
   window.addEventListener('keydown', () => son.activer(), { once: true });
   brancherEntrees();
+  if (OPTIONS.has('inspecteur')) {
+    const { creerInspecteur } = await import('./vue/inspecteur.js');
+    inspecteur = creerInspecteur(document.querySelector('main'));
+  }
   etat.textContent = '';
 
   donnees.fichiers.set('QUEST.CFG', configuration(donnees.fichiers.get('QUEST.CFG')));

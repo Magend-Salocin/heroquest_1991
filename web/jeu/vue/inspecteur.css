@@ -1,0 +1,25 @@
+/* Inspecteur (vue/inspecteur.js) : à droite de l'écran du jeu, en dessous sur un écran étroit. */
+body.avec-inspecteur { place-items: start center; }
+body.avec-inspecteur main { grid-template-columns: auto minmax(0, 30em); align-items: start; column-gap: 16px; padding: 8px; }
+body.avec-inspecteur #ecran, body.avec-inspecteur #texte { width: min(calc(96vw - 32em), 128vh); }
+body.avec-inspecteur main > :not(#inspecteur) { grid-column: 1; }
+body.avec-inspecteur #inspecteur { grid-column: 2; grid-row: 1 / span 4; }
+
+#inspecteur { font: 12px/1.4 monospace; color: #ccc; max-height: calc(100dvh - 16px); overflow-y: auto; }
+#inspecteur h2 { font: bold 12px sans-serif; color: #fff; margin: 10px 0 4px; }
+#inspecteur p, #inspecteur ol { margin: 0; }
+#inspecteur .entete { color: #fff; }
+#inspecteur .pile { padding-left: 2.5em; max-height: 10em; overflow-y: auto; }
+#inspecteur table { border-collapse: collapse; }
+#inspecteur th, #inspecteur td { padding: 1px 6px; text-align: left; border-bottom: 1px solid #333; }
+#inspecteur tr.courant td { color: #ff6; }
+#inspecteur .grilles { display: flex; flex-wrap: wrap; gap: 6px; }
+#inspecteur canvas { width: 208px; image-rendering: pixelated; cursor: crosshair; }
+#inspecteur .legende { color: #888; margin-top: 4px; }
+#inspecteur .detail { margin: 6px 0 0; white-space: pre-wrap; color: #fff; min-height: 6em; }
+
+@media (max-width: 900px) {
+  body.avec-inspecteur main { grid-template-columns: 1fr; }
+  body.avec-inspecteur #ecran, body.avec-inspecteur #texte { width: min(96vw, 128vh); }
+  body.avec-inspecteur #inspecteur { grid-column: 1; grid-row: auto; max-height: none; }
+}

@@ -85,6 +85,7 @@ export class Machine {
     this.ip = exe.ip;
     this.ss = L + exe.ss;
     this.sp = exe.sp;
+    this.spDepart = exe.sp;            // fond de la pile (l'inspecteur la lit jusque-là)
     this.ds = this.es = psp;
     this.ax = this.bx = this.cx = this.dx = this.si = this.di = this.bp = 0;
     if (this.mode !== 0x13) this.effacerTexte();

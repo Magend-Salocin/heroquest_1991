@@ -20,6 +20,7 @@ Un seul affichage, le VGA, et un seul son, l'AdLib. La page fournit `QUEST.CFG` 
 | `index.html?debug` | affiche sous l'écran le programme, le temps de jeu et l'IP ; expose `window.jeu` (son, machine) |
 | `index.html?paquet`, `?paquet=URL`, `?importer` | ignore le serveur PHP et utilise le paquet de l'appareil ; l'importe depuis une adresse ; propose d'en importer un autre |
 | `index.html?tactile`, `?sans-tactile` | force ou masque les commandes tactiles (affichées d'office sur un écran tactile) |
+| `index.html?inspecteur` | panneau qui montre la partie telle que le code la voit (voir « Inspecteur ») |
 
 Le jeu dessine son propre curseur. Clavier : positions physiques du PC (voir `jeu/clavier.js`) ; Ctrl quitte.
 
@@ -37,7 +38,7 @@ Son : comme dans l'original, la musique joue au départ (dès l'intro) et les ef
 | `jeu/tactile.js` | commandes tactiles : clic droit, clavier de l'appareil, F10, vibration ; gestes sur l'écran (appui long, deux doigts) dans `principal.js` |
 | `sw.js`, `manifest.webmanifest`, `icones/` | hors ligne et installation sur l'écran d'accueil (site publié) |
 | `jeu/lisible/` | le code réécrit à la main, lisible (voir « Code lisible ») |
-| `jeu/vue/` | lecture de l'état de la partie pour l'inspecteur et la vue moderne (voir « État de la partie ») |
+| `jeu/vue/` | lecture de l'état de la partie (voir « État de la partie ») et inspecteur (voir « Inspecteur ») |
 | `jeu/clavier.js` | codes clavier du PC |
 | `jeu/son.js` | joue les WAV (de `sons/` ou du paquet) quand le jeu appelle son pilote (int 60h : jouer, arrêter, silence) ; la musique en boucle |
 | `sons/` | les morceaux du pilote AdLib en WAV (mono, 16 bits, 22 050 Hz), générés (voir « Son »), ignorés par git |
@@ -120,6 +121,20 @@ Pour l'écrire en JSON à la fin d'un essai (ici au début de la 1re quête) :
 ```bash
 ETAT=etat.json node essai.mjs 5 plateau.png "clic:68:128,attendre:3,clic:160:44,attendre:4,clic:160:180,attendre:4"
 ```
+
+## Inspecteur
+
+`index.html?inspecteur` (ou `?inspecteur=1`) ajoute un panneau à droite de l'écran du jeu, en dessous sur un écran de moins de 900 px. Il est rafraîchi tous les dixièmes de seconde et ne fait que lire la mémoire. Sans le paramètre, `jeu/vue/inspecteur.js` n'est pas chargé.
+
+| Partie | Contenu |
+| --- | --- |
+| En-tête | quête, personnage courant, routine en cours (nom de `symboles.txt`) et IP |
+| Pile d'appels | estimée : les mots de la pile du programme qui suivent un `call` proche (E8 ou FF /2) dans le code, de la plus récente à la plus ancienne, et les routines lisibles par étapes en cours, marquées « (lisible) ». Une donnée de la pile qui ressemble à une adresse de retour peut s'y glisser |
+| Hasard | nombre de tirages depuis l'ouverture du panneau, dernier tirage (1 à max, résultat, registre avant et après) et registre actuel (DS:38FD). Le suivi passe par `Hasard.observateur` de `jeu/lisible/hasard.js` : avec `?genere`, seul le registre est montré |
+| Héros, monstres vus | fiches présentes (personnage courant en jaune), monstres vus et vivants |
+| Plateau | les trois grilles (zones, murs et portes, occupants), une case par 8 px ; le survol d'une case la détaille |
+
+`machine.js` garde le fond de la pile au chargement (`spDepart`) pour que la lecture de la pile s'y arrête.
 
 ## Son
 
