@@ -38,6 +38,20 @@ const placerMortVivant = (cas) => {
   octetDS(cas, 0x4d4a + 10 * (numero - 1) + 8, 4 + alea(3));
   const fiche = lireOctetDS(cas, 0x4637) | (lireOctetDS(cas, 0x4638) << 8);
   octetDS(cas, fiche + 3, lireOctetDS(cas, caseZones) & 0x3f);
+  return numero;
+};
+// Pioche des trésors : les 25 cartes mélangées, puis FFh ; carte_tresor (DS:4655) sur le FFh.
+// Une fois sur quatre, des cartes sont déjà sorties du jeu ; celles qui sont toujours remises sous
+// la pioche (or, arbalète, monstres) restent : sans carte d'or, une pioche de monstres errants
+// sans case libre ferait tourner la fouille sans fin, dans l'original comme ici.
+const melangerPioche = (cas) => {
+  const remises = (c) => c <= 8 || c >= 17;
+  const cartes = [...Array(25).keys()].filter((c) => remises(c) || alea(4) !== 0);
+  for (let n = cartes.length - 1; n > 0; n--) { const k = alea(n + 1); [cartes[n], cartes[k]] = [cartes[k], cartes[n]]; }
+  const nombre = cartes.length;
+  for (let n = 0; n < 26; n++) octetDS(cas, 0x463b + n, n < nombre ? cartes[n] : 0xff);
+  octetDS(cas, 0x4655, (0x463b + nombre) & 0xff);
+  octetDS(cas, 0x4656, (0x463b + nombre) >> 8);
 };
 // Bouton gauche enfoncé (DS:3992 bit 0x10), pas de piège ni de pas en file la plupart du temps.
 const clicEnCours = (cas) => {
@@ -64,6 +78,32 @@ const ENTREES = {
     octetDS(cas, 0x3fa7, alea(5) === 0 ? 4 : alea(4));
     octetDS(cas, 0x4289, alea(2) ? 0x0b : 1);
     if (alea(2)) placerMortVivant(cas);
+  },
+  // Fouille du trésor : DI fiche courante, icône enfoncée trois fois sur quatre, personnage courant
+  // (4 : Sir Ragnar), pioche mélangée au hasard, événement de la zone du héros (0 surtout : une carte).
+  fouille_tresor: (cas) => {
+    const fiche = lireOctetDS(cas, 0x4637) | (lireOctetDS(cas, 0x4638) << 8);
+    cas.etat.di = fiche;
+    octetDS(cas, 0x42f5, alea(4) ? 0x1c : 0x0b);
+    octetDS(cas, 0x3fa7, alea(6) === 0 ? 4 : (fiche - 0x4663) / 26);
+    melangerPioche(cas);
+    for (let zone = 0; zone < 43; zone++) {
+      const tirage = alea(8);
+      octetDS(cas, 0x4b70 + zone, tirage < 5 ? 0 : tirage === 5 ? 0xff : 1 + alea(30));
+    }
+    if (alea(3) === 0) octetDS(cas, fiche + 6, 1 + alea(2));       // héros à 1 ou 2 points : l'arbalète peut tuer
+    // Un monstre dans la zone du héros ; à cause du bogue de monstre_actif_case, c'est l'octet +6 du
+    // monstre précédent qui compte : on le rend actif une fois sur deux.
+    if (alea(3) === 0) {
+      const numero = placerMortVivant(cas);
+      if (numero > 1 && alea(2)) octetDS(cas, 0x4d4a + 10 * (numero - 2) + 6, 4);
+    }
+  },
+  tire_carte: (cas) => melangerPioche(cas),
+  remet_carte: (cas) => { melangerPioche(cas); cas.etat.ax = alea(25); },
+  monstre_actif_case: (cas) => {
+    cas.etat.bx = 0x546f + alea(494);
+    if (alea(2)) octetDS(cas, cas.etat.bx + 0x400, 1 + alea(32));
   },
   // AL numéro du personnage, AH type de commande (souris), BX sa fiche, DX son sprite.
   // Sur le plateau de la 1re quête, seul Sigmar (fiche 0) joue : les autres fiches sont vides.

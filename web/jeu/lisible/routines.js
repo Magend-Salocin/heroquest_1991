@@ -20,6 +20,7 @@ import { Combat } from './combat.js';
 import { Deplacement } from './deplacement.js';
 import { Tour } from './tour.js';
 import { Inventaire, numeroBit } from './inventaire.js';
+import { Fouilles } from './fouilles.js';
 import { Fiche } from './donnees.js';
 
 // Adresse de retour réservée : le segment de code de QUEST s'arrête à 0x97C0.
@@ -270,6 +271,36 @@ export const ROUTINES_QUEST = {
     nom: 'utilise_objet', cout: 20, sortie: [], etapes: true, fin: [0x90e7, 0x91e2, 0x8f5d],
     executer: ({ inventaire }, m) => inventaire.utiliserObjet(m.bx),
   },
+
+  // ---- Fouille du trésor (fouilles.js)
+  0x6d66: {
+    nom: 'tire_carte', cout: 120, sortie: ['al', 'si', 'cx', 'bp'],
+    // Sortie AL la carte tirée ; SI, CX, BP laissés par la boucle.
+    executer({ fouilles }, m) {
+      const r = fouilles.tirerCarte();
+      Object.assign(m, { ax: octetBas(m.ax, r.carte), si: r.lue, cx: r.reste, bp: r.place });
+    },
+  },
+  0x6d8b: {
+    nom: 'remet_carte', cout: 6, sortie: ['bx'],
+    // Entrée AL la carte. Sortie BX la nouvelle fin de pioche.
+    executer({ fouilles }, m) { m.bx = fouilles.remettreCarte(m.ax & 0xff); },
+  },
+  0x6dd7: {
+    nom: 'monstre_actif_case', cout: 12, sortie: [], etapes: true,
+    // Entrée BX : la case dans grille_zones.
+    executer: ({ fouilles }, m) => fouilles.monstreActifCase(m.bx),
+  },
+  0x6d9a: {
+    nom: 'monstre_dans_zone', cout: 20, sortie: [], etapes: true,
+    executer: ({ fouilles }) => fouilles.chercherMonstreDansZone(),
+  },
+  // Atteinte par un saut depuis clic_tour (DI fiche) ; finit par ret, ou par un saut vers
+  // affiche_message, mort_heros, l'événement de la zone, la fin de fouille ou le monstre errant.
+  0x6be0: {
+    nom: 'fouille_tresor', cout: 12, sortie: [], etapes: true,
+    executer: ({ fouilles }) => fouilles.fouillerTresor(),
+  },
 };
 
 // Remplace, dans la table des routines générées, l'entrée de chaque routine réécrite.
@@ -328,5 +359,6 @@ export function creerJeu(machine) {
   jeu.deplacement = new Deplacement(jeu);
   jeu.tour = new Tour(jeu);
   jeu.inventaire = new Inventaire(jeu);
+  jeu.fouilles = new Fouilles(jeu);
   return jeu;
 }

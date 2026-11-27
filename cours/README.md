@@ -32,6 +32,7 @@ Les exercices se font dans une copie de travail (une branche git). Après une mo
 | 4 | [Le déplacement](04-deplacement.md) | grilles en tableau à une dimension, murs sans doublon, recherche en profondeur avec coupes, parcours en largeur |
 | 5 | [Le tour de jeu](05-tour.md) | boucle de jeu, tampon hors écran, zones cliquables pilotées par une table |
 | 6 | [Les objets et l'inventaire](06-objets.md) | champs de bits et listes, règles pilotées par une table, exclusions, registres partagés |
+| 7 | [La fouille et la pioche des trésors](07-fouilles.md) | sentinelle, file, plages de valeurs, appel terminal |
 
 Toutes les leçons suivent le même plan : [GABARIT.md](GABARIT.md).
 
