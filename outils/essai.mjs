@@ -3,6 +3,7 @@
 // actions : liste séparée par des virgules, exécutée dans l'ordre, par exemple
 //   "attendre:3,clic:160:100,touche:39,attendre:2,capture:a.png"
 // (souris en coordonnées d'écran 320 x 200 ; touche = code clavier en hexadécimal).
+// ETAT=etat.json écrit en plus l'état de la partie à la fin (web/jeu/vue/etat.js).
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -93,6 +94,10 @@ async function principal() {
     else if (nom === 'espace') { m.toucheBios(0x20, 0x39); m.appuyer(0x39); avancer(m, 0.1); m.relacher(0x39); avancer(m, 0.5); }
   }
   if (m.fichiers.has('QUEST.CFG')) console.log('QUEST.CFG', Array.from(m.fichiers.get('QUEST.CFG')).join(' '));
+  if (process.env.ETAT && !process.env.PROGRAMME) {          // ETAT=etat.json : état de la partie (web/jeu/vue/etat.js)
+    const { lireEtat } = await import('../web/jeu/vue/etat.js');
+    fs.writeFileSync(process.env.ETAT, JSON.stringify(lireEtat(m), null, 1));
+  }
   if (m.mode === 0x13 || m.planaire) capturer(m, capture);
   else console.log(m.texte());
   console.log(`t = ${(m.t / INSTRUCTIONS_PAR_MS / 1000).toFixed(1)} s, IP ${m.ip.toString(16)}, mode ${m.mode.toString(16)}, arrêt ${m.arret}`);

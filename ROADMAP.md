@@ -1,6 +1,6 @@
 # Roadmap
 
-État au 28 octobre 2026. Objectif : rejouer HeroQuest PC (Gremlin, 1991) dans un navigateur, à l'identique, à partir du code original. Chaque phase produit un livrable utilisable seul.
+État au 27 novembre 2026. Objectif : rejouer HeroQuest PC (Gremlin, 1991) dans un navigateur, à l'identique, à partir du code original. Chaque phase produit un livrable utilisable seul.
 
 ## Phase 0 : récupérer l'original (faite)
 
@@ -82,6 +82,24 @@ Reste :
 3. Mobile : fait le 20 novembre 2026. Le moteur est publié sur GitHub Pages sans rien du jeu d'origine ; les fichiers du jeu, le code traduit et les sons arrivent par un paquet importé sur l'appareil ; commandes tactiles, hors ligne, installation sur l'écran d'accueil ([WEB_DEPLOIEMENT.md](WEB_DEPLOIEMENT.md)). 25 novembre 2026 : clic droit par appui long ou deux doigts, vibration, disposition paysage. Reste : essai sur un vrai iPhone.
 4. Langues : fait, les 5 langues se choisissent dans l'adresse de la page (`?langue=en`), l'écran des drapeaux de l'intro n'existant qu'en EGA.
 
+## Phase 5 : cours et vue moderne (commencée le 27 novembre 2026)
+
+But : se servir du jeu pour enseigner la programmation, et proposer une seconde façon de l'afficher. Chaque sous-système réécrit en JS lisible (phase 3, Reste 3) devient une leçon dans `cours/`, et un inspecteur montre le code au travail pendant la partie. La vue moderne lit l'état dans la mémoire du jeu émulé et le dessine avec des graphismes créés pour le projet. Elle agit uniquement par l'entrée du jeu (clics simulés), si bien que les règles et les dés restent ceux du code d'origine (D6). Plan détaillé et prompts de chaque étape : [docs/PLAN-cours-vue-moderne.md](docs/PLAN-cours-vue-moderne.md).
+
+| Étape | Sujet | État |
+| --- | --- | --- |
+| 1 | Couche d'état lisible (`web/jeu/vue/etat.js`) | faite le 27 novembre 2026 ; reste à identifier la variable qui distingue le tour des héros de celui des monstres |
+| 2 | Inspecteur (`?inspecteur=1`) | à faire |
+| 3 | Dossier `cours/` et leçon 1 (hasard et dés) | à faire |
+| 4 | Leçons du code déjà réécrit (routines par étapes, combat, déplacement, tour) | à faire |
+| 5 | Réécrire un sous-système, puis sa leçon (à répéter) | à faire |
+| 6 | Prompts des graphismes (`docs/prompts-interface.md`) | à faire |
+| 7 | Script de découpe des planches | à faire |
+| 8 | Vue moderne : plateau en lecture seule | à faire |
+| 9 | Vue moderne : bascule et interface | à faire |
+| 10 | Vue moderne : commandes | à faire |
+| 11 | Vue moderne : graphismes définitifs | à faire |
+
 ## Décisions à prendre
 
 | N° | Question | Proposition |
@@ -90,4 +108,5 @@ Reste :
 | D2 | Rôle de PHP : simple service (fichiers, sauvegardes) ou aussi les règles côté serveur ? | Simple service : le jeu d'origine tourne en local, les règles restent en JavaScript |
 | D3 | Son : émulation AdLib ou musiques enregistrées ? | Tranchée le 28 octobre 2026 : musiques enregistrées (WAV), AdLib seulement |
 | D4 | Langue par défaut | Français (`FRENCH.BIN`), les autres en option |
-| D5 | Lien avec `donjon-v2` : projets séparés, ou le remake devient un mode de `donjon-v2` ? | Séparés tant que le portage n'est pas fini |
+| D5 | Lien avec `donjon-v2` : projets séparés, ou le remake devient un mode de `donjon-v2` ? | Tranchée le 27 novembre 2026 : la vue moderne est un mode de heroquest_1991 (phase 5) ; `donjon-v2` reste un projet séparé, et ses atlas isométriques (extraits ou redessinés d'après le jeu) ne sont pas repris |
+| D6 | La vue moderne est-elle tenue à l'identique ? | Tranchée le 27 novembre 2026 : pas au pixel près, mais mêmes règles et mêmes dés, puisqu'elle lit la mémoire et passe par l'entrée du jeu sans rien écrire elle-même |

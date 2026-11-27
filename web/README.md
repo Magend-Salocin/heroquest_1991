@@ -37,6 +37,7 @@ Son : comme dans l'original, la musique joue au départ (dès l'intro) et les ef
 | `jeu/tactile.js` | commandes tactiles : clic droit, clavier de l'appareil, F10, vibration ; gestes sur l'écran (appui long, deux doigts) dans `principal.js` |
 | `sw.js`, `manifest.webmanifest`, `icones/` | hors ligne et installation sur l'écran d'accueil (site publié) |
 | `jeu/lisible/` | le code réécrit à la main, lisible (voir « Code lisible ») |
+| `jeu/vue/` | lecture de l'état de la partie pour l'inspecteur et la vue moderne (voir « État de la partie ») |
 | `jeu/clavier.js` | codes clavier du PC |
 | `jeu/son.js` | joue les WAV (de `sons/` ou du paquet) quand le jeu appelle son pilote (int 60h : jouer, arrêter, silence) ; la musique en boucle |
 | `sons/` | les morceaux du pilote AdLib en WAV (mono, 16 bits, 22 050 Hz), générés (voir « Son »), ignorés par git |
@@ -97,6 +98,28 @@ GENERE=1 node essai.mjs 5 gen.png "…"        # le même parcours avec le code 
 `lisible.mjs` mène d'abord le jeu jusqu'au plateau de la 1re quête, puis tire au hasard la graine, les fiches, le monstre visé, l'état du tour et les alentours du héros (murs, portes, occupants, zones), avec des scénarios ciblés (voie libre, piège caché, téléport du château, pièce tournante). Il compare toute la mémoire (données, écran, images), sauf la pile. Les boîtes de message et les attentes de clic reçoivent des clics simulés (droit, ou gauche sur OUI), réglés sur le nombre de lectures de la souris et non sur le temps, qui diffère de quelques instructions entre les deux versions.
 
 Au 18 novembre 2026 : les 25 routines sont identiques sur 100 cas chacune (seconde attaque du poison d'orc, pas réussis, portes, pièges cachés et téléport du château couverts), et un parcours avec lancer de dés, clics sur le plateau et sur les 4 flèches donne la même image qu'avec le code généré seul.
+
+## État de la partie
+
+`jeu/vue/etat.js` lit la partie en cours dans la mémoire du jeu et la rend sous forme d'objet JavaScript simple, sans référence à la mémoire et sans rien y écrire. C'est la base de l'inspecteur et de la vue moderne (phase 5 de la [roadmap](../ROADMAP.md)). Toutes les lectures passent par `jeu/lisible/donnees.js`.
+
+`lireEtat(machine)` renvoie :
+
+| Champ | Contenu |
+| --- | --- |
+| `quete` | numéro de la quête (0 = la 1re) |
+| `personnageCourant` | personnage qui joue, ou qui a joué en dernier (0 à 4) ; aucune variable identifiée ne dit encore si c'est le tour des monstres |
+| `plateau.cases` | 26 × 19 cases, rangées `y × 26 + x` : `zone`, `vue`, `bordVu`, les 4 bords (`haut`, `gauche`, `bas`, `droite` : `mur`, `porte` avec `ouverte` et `secrete`) et `occupant` |
+| `heros` | fiches présentes : `numero`, `type` et `nomType`, `x`, `y`, `zone`, points de corps et d'esprit, dés d'attaque et de défense, `or` |
+| `monstres` | enregistrements non vides : `numero`, `type` et `nomType`, `x`, `y`, `zone`, `vu`, `vivant`, `reveille`, `passeSonTour`, `endormi` |
+
+Un occupant a une `sorte` : `monstre` (avec son `numero` dans `monstres`), `éboulis`, `piège` (avec `cache` pour une fosse non trouvée), `escalier`, `meuble` (`nom` ; `suite` pour les cases supplémentaires d'un meuble). Les pièges cachés et les portes secrètes sont présents dans l'état : c'est à la vue de ne pas montrer ce que les héros n'ont pas trouvé.
+
+Pour l'écrire en JSON à la fin d'un essai (ici au début de la 1re quête) :
+
+```bash
+ETAT=etat.json node essai.mjs 5 plateau.png "clic:68:128,attendre:3,clic:160:44,attendre:4,clic:160:180,attendre:4"
+```
 
 ## Son
 
