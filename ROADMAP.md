@@ -93,7 +93,7 @@ But : se servir du jeu pour enseigner la programmation, et proposer une seconde 
 | 3 | Dossier `cours/` et leçon 1 (hasard et dés) | fait le 27 novembre 2026 |
 | 4 | Leçons du code déjà réécrit (routines par étapes, combat, déplacement, tour) | fait le 27 novembre 2026 (leçons 2 à 5) |
 | 5 | Réécrire un sous-système, puis sa leçon (à répéter) | en cours : objets de l'inventaire et leçon 6 faits le 27 novembre 2026 ; reste l'écran de l'inventaire, puis les sous-systèmes suivants |
-| 6 | Prompts des graphismes (`docs/prompts-interface.md`) | à faire |
+| 6 | Prompts des graphismes (`docs/prompts-interface.md`) | fait le 27 novembre 2026 ; planches à générer |
 | 7 | Script de découpe des planches | à faire |
 | 8 | Vue moderne : plateau en lecture seule | à faire |
 | 9 | Vue moderne : bascule et interface | à faire |
