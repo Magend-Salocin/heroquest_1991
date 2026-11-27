@@ -47,6 +47,7 @@ Toutes depuis `outils/`, sauf le serveur. Prérequis : Python 3.10+ (`pillow cap
 | Jeu sans navigateur, capture | `node essai.mjs 5 menu.png "clic:68:128,attendre:3"` |
 | Servir la page | `php -S 127.0.0.1:8765 -t web` depuis la racine |
 | Construire le site publié | `node construire-site.mjs` (-> `_site/`) |
+| Découper les planches de la vue moderne | `python decouper-planches.py` (`graphismes/planches/` -> `web/vue/images/`) |
 | Paquet de données pour le téléphone | `node paquet.mjs` (-> `paquet/heroquest-donnees.bin`) |
 | Version PC (Electron), depuis la racine | `npm start` ; `npm run dist` pour le `.exe` portable |
 

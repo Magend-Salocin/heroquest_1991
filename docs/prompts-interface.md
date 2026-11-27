@@ -6,7 +6,7 @@ Les images de la vue moderne (phase 5, [plan](PLAN-cours-vue-moderne.md)) sont g
 
 1. Générer chaque planche avec son prompt : le bloc de style commun, puis le texte propre à la planche.
 2. Enregistrer l'image sous `graphismes/planches/<nom de la planche>.png` (par exemple `graphismes/planches/sols.png`).
-3. Lancer le script de découpe (étape 7 du plan) : il découpe la grille, retire le fond vert, recadre, redimensionne et écrit `web/vue/images/<nom>.png`, puis l'atlas.
+3. Lancer `python decouper-planches.py` depuis `outils/` (description des planches : `outils/planches.json`) : il découpe la grille, retire le fond vert, recadre, redimensionne et écrit `web/vue/images/<nom>.png`, puis l'atlas.
 
 Règles pour toutes les planches, sinon la découpe se passe mal :
 

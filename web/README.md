@@ -141,6 +141,10 @@ ETAT=etat.json node essai.mjs 5 plateau.png "clic:68:128,attendre:3,clic:160:44,
 
 `machine.js` garde le fond de la pile au chargement (`spDepart`) pour que la lecture de la pile s'y arrête.
 
+## Graphismes de la vue moderne
+
+La vue moderne (phase 5) utilise des images créées pour le projet, versionnées dans `vue/images/` : `atlas.png` et `atlas.json` (nom -> `x`, `y`, `l`, `h`, `ancrage` en pixels, point de pose de l'image sur sa case). Elles sont découpées dans les planches de `graphismes/planches/` par `outils/decouper-planches.py`, d'après `outils/planches.json` ; les prompts sont dans [docs/prompts-interface.md](../docs/prompts-interface.md).
+
 ## Son
 
 Le pilote d'origine (`ADLIB.DRV`) n'est pas exécuté dans la page. Ses morceaux sont rendus une fois en WAV, depuis `outils/` :

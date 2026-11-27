@@ -1,0 +1,82 @@
+{
+  "_lisez-moi": "Planches de la vue moderne (docs/prompts-interface.md), lues par decouper-planches.py. grille : [colonnes, rangées]. noms : une entrée par case, de gauche à droite puis de haut en bas (null : case vide). taille : [largeur, hauteur] de sortie ; tailles : taille propre à certains noms. ancrage : point de pose dans l'image de sortie, en fraction de la largeur et de la hauteur. cadrage : 'bas' (l'élément posé en bas, centré) ou 'centre'. detourer : retirer le fond vert. decoupe : 'grille', 'neuf' (cadre en 9 morceaux, marge en px de la planche) ou 'bandes' (bandes horizontales, hauteurs en px de la planche).",
+  "sols": {
+    "grille": [6, 4], "taille": [64, 32], "ancrage": [0.5, 1.0], "cadrage": "centre", "detourer": true,
+    "noms": [
+      "sol-piece-1", "sol-piece-2", "sol-piece-3", "sol-piece-4", "sol-piece-5", "sol-piece-6",
+      "sol-couloir-1", "sol-couloir-2", "sol-couloir-3", "sol-couloir-4", "sol-couloir-5", "sol-couloir-6",
+      "sol-fissure-1", "sol-fissure-2", "sol-fissure-3", "sol-mousse-1", "sol-mousse-2", "sol-mousse-3",
+      "sol-terre-1", "sol-terre-2", "sol-terre-3", "sol-os-1", "sol-os-2", "sol-os-3"
+    ]
+  },
+  "murs": {
+    "grille": [4, 2], "taille": [64, 96], "ancrage": [0.5, 1.0], "cadrage": "bas", "detourer": true,
+    "noms": [
+      "mur-haut", "mur-haut-torche", "mur-haut-fissure", "mur-haut-chaines",
+      "mur-gauche", "mur-gauche-torche", "mur-gauche-fissure", "mur-gauche-chaines"
+    ]
+  },
+  "portes": {
+    "grille": [4, 2], "taille": [64, 96], "ancrage": [0.5, 1.0], "cadrage": "bas", "detourer": true,
+    "tailles": { "escalier": [128, 96], "eboulis": [64, 64] },
+    "noms": [
+      "porte-haut-fermee", "porte-haut-ouverte", "porte-gauche-fermee", "porte-gauche-ouverte",
+      "secret-haut", "secret-gauche", "escalier", "eboulis"
+    ]
+  },
+  "meubles": {
+    "grille": [4, 3], "taille": [128, 128], "ancrage": [0.5, 1.0], "cadrage": "bas", "detourer": true,
+    "tailles": {
+      "meuble-coffre": [64, 64], "meuble-trone": [64, 96], "meuble-tonneaux": [64, 64],
+      "meuble-armoire": [96, 128], "meuble-bibliotheque": [128, 128], "meuble-cheminee": [128, 128], "meuble-ratelier": [128, 112]
+    },
+    "noms": [
+      "meuble-table", "meuble-coffre", "meuble-armoire", "meuble-bibliotheque",
+      "meuble-trone", "meuble-tombeau", "meuble-cheminee", "meuble-etabli",
+      "meuble-chevalet", "meuble-ratelier", "meuble-tonneaux", null
+    ]
+  },
+  "monstres": {
+    "grille": [4, 3], "taille": [64, 80], "ancrage": [0.5, 1.0], "cadrage": "bas", "detourer": true,
+    "noms": [
+      "monstre-gobelin", "monstre-orc", "monstre-brute", "monstre-guerrier-noir",
+      "monstre-squelette", "monstre-zombi", "monstre-momie", "monstre-gargouille",
+      "monstre-chef-orc", "monstre-sorcier-trone", "monstre-sorcier", null
+    ]
+  },
+  "pions-heros": {
+    "grille": [4, 2], "taille": [64, 96], "ancrage": [0.5, 1.0], "cadrage": "bas", "detourer": true,
+    "noms": [
+      "heros-barbare-h-bas", "heros-nain-h-bas", "heros-elfe-h-bas", "heros-enchanteur-h-bas",
+      "heros-barbare-h-haut", "heros-nain-h-haut", "heros-elfe-h-haut", "heros-enchanteur-h-haut"
+    ]
+  },
+  "pions-heroines": {
+    "grille": [4, 2], "taille": [64, 96], "ancrage": [0.5, 1.0], "cadrage": "bas", "detourer": true,
+    "noms": [
+      "heros-barbare-f-bas", "heros-nain-f-bas", "heros-elfe-f-bas", "heros-enchanteur-f-bas",
+      "heros-barbare-f-haut", "heros-nain-f-haut", "heros-elfe-f-haut", "heros-enchanteur-f-haut"
+    ]
+  },
+  "interface-cadre": {
+    "decoupe": "neuf", "marge": 128, "echelle": 0.25, "detourer": false,
+    "noms": ["cadre-coin-hg", "cadre-haut", "cadre-coin-hd", "cadre-gauche", "cadre-fond", "cadre-droite", "cadre-coin-bg", "cadre-bas", "cadre-coin-bd"]
+  },
+  "interface-icones": {
+    "grille": [6, 4], "taille": [48, 48], "ancrage": [0.5, 0.5], "cadrage": "centre", "detourer": true,
+    "noms": [
+      "icone-deplacer", "icone-attaquer", "icone-tresor", "icone-chercher", "icone-sort", "icone-inventaire",
+      "icone-fin-tour", "icone-carte", "icone-porte", "icone-regarder", "icone-son", "icone-menu",
+      "bouton-normal", "bouton-survol", "bouton-enfonce", "bouton-inactif", "fleche-gauche", "fleche-droite",
+      "jauge-corps", "jauge-esprit", "jauge-or", "jauge-defense", "jauge-attaque", "jauge-temps"
+    ]
+  },
+  "des": {
+    "grille": [3, 3], "taille": [48, 48], "ancrage": [0.5, 0.5], "cadrage": "centre", "detourer": true,
+    "noms": ["de-1", "de-2", "de-3", "de-4", "de-5", "de-6", "de-crane", "de-bouclier-blanc", "de-bouclier-noir"]
+  },
+  "parchemin": {
+    "decoupe": "bandes", "bandes": [192, 640, 192], "echelle": 0.25, "detourer": true,
+    "noms": ["parchemin-haut", "parchemin-milieu", "parchemin-bas"]
+  }
+}
