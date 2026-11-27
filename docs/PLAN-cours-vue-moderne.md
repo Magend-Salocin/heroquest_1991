@@ -43,7 +43,7 @@ Dans le tableau des décisions :
 - D5 : tranchée, la vue moderne est un mode de heroquest_1991 ; donjon-v2 reste un projet séparé, et ses atlas iso ne sont pas repris.
 - Ajoute D6 : la vue moderne n'est pas tenue au pixel près, mais les règles et les dés sont ceux du code d'origine, puisqu'elle ne fait que lire la mémoire et envoyer des commandes.
 
-Mets à jour la date d'état. N'écris rien d'autre. Ne fais pas de commit.
+Mets à jour la date d'état. N'écris rien d'autre. Fais un commit en français à la fin de l'étape.
 ```
 
 ## Étape 1 : couche d'état lisible
@@ -63,7 +63,7 @@ Utilise exclusivement les accès de donnees.js (Donnees, TABLES, Fiche, Monstre)
 
 Ajoute à outils/essai.mjs une option qui écrit lireEtat en JSON à la fin de l'essai. Vérifie sur un essai qui va jusqu'au plateau : positions des héros et cases vues cohérentes avec la capture.
 
-Documente le module dans web/README.md. Pas de commit.
+Documente le module dans web/README.md. Fais un commit en français à la fin de l'étape.
 ```
 
 ## Étape 2 : inspecteur
@@ -79,7 +79,7 @@ Ajoute un inspecteur activé par ?inspecteur=1 : un panneau à côté de l'écra
 3. le dernier tirage du hasard (routine hasard de web/jeu/lisible/hasard.js : valeur, graine avant et après) ;
 4. si c'est faisable sans ralentir le jeu, le nom de la routine en cours et la pile d'appels (noms de symboles.txt, déjà présents dans quest.gen.js). Sinon, explique pourquoi et propose une alternative.
 
-Code dans web/jeu/vue/inspecteur.js et un fichier CSS séparé. Sans ?inspecteur=1, aucun coût et aucun changement. Vérifie dans le navigateur (php -S 127.0.0.1:8765 -t web). Documente-le dans web/README.md. Pas de commit.
+Code dans web/jeu/vue/inspecteur.js et un fichier CSS séparé. Sans ?inspecteur=1, aucun coût et aucun changement. Vérifie dans le navigateur (php -S 127.0.0.1:8765 -t web). Documente-le dans web/README.md. Fais un commit en français à la fin de l'étape.
 ```
 
 ## Étape 3 : dossier cours/ et leçon 1
@@ -100,7 +100,7 @@ Crée cours/README.md : public visé (débutants qui connaissent les bases de Ja
 
 Écris cours/01-hasard-et-des.md : générateur pseudo-aléatoire, graine, pourquoi la même graine donne les mêmes dés, tirage du dé de combat. Exercice : forcer la graine et rejouer la même attaque.
 
-Règle du dépôt public : citer uniquement le code lisible, jamais original/asm ni *.gen.js. Pas de commit.
+Règle du dépôt public : citer uniquement le code lisible, jamais original/asm ni *.gen.js. Fais un commit en français à la fin de l'étape.
 ```
 
 ## Étape 4 : leçons du code déjà réécrit
@@ -116,7 +116,7 @@ Lis .claude/CLAUDE.md, cours/README.md, cours/GABARIT.md, cours/01-hasard-et-des
 - cours/04-deplacement.md : grille, bits de murs et de portes, chemin vers la case cliquée ;
 - cours/05-tour.md : déroulé d'un tour de héros puis des monstres.
 
-Chaque exercice doit pouvoir se vérifier dans le jeu ou avec node outils/lisible.mjs. Mets à jour la liste dans cours/README.md. Pas de commit.
+Chaque exercice doit pouvoir se vérifier dans le jeu ou avec node outils/lisible.mjs. Mets à jour la liste dans cours/README.md. Fais un commit en français à la fin de l'étape.
 ```
 
 ## Étape 5 : réécrire un sous-système, puis sa leçon (à répéter)
@@ -145,7 +145,7 @@ Lis .claude/CLAUDE.md, ROADMAP.md (phase 3, Reste) et la note de original/notes/
 4. Écris la leçon suivante dans cours/, selon cours/GABARIT.md. Ne cite que le code lisible.
 5. Mets à jour web/README.md, ROADMAP.md (compte de routines sur 379) et le suivi de docs/PLAN-cours-vue-moderne.md.
 
-Si le sous-système est trop gros pour une session, arrête-toi à un ensemble cohérent de routines vérifiées et indique précisément ce qui reste. Pas de commit.
+Si le sous-système est trop gros pour une session, arrête-toi à un ensemble cohérent de routines vérifiées et indique précisément ce qui reste. Fais un commit en français à la fin de l'étape.
 ```
 
 ## Étape 6 : prompts des graphismes
@@ -173,7 +173,7 @@ Planches à prévoir :
 
 Les héros réutilisent les portraits et pions déjà découpés dans D:/VisualCode_Perso/Donjon/Donjon/donjon-v2/public/assets/game/images/avatars/ ; prévois seulement une planche de pions isométriques en pied (4 types × 2 sexes, 4 directions) dans le même style.
 
-Pas de commit.
+Fais un commit en français à la fin de l'étape.
 ```
 
 ## Étape 7 : script de découpe des planches
@@ -187,7 +187,7 @@ Lis .claude/CLAUDE.md et docs/prompts-interface.md.
 
 La description des planches (grille, noms, tailles, ancrages) est dans un seul fichier outils/planches.json, pas en dur dans le script. Une planche absente est ignorée avec un message.
 
-Ces images sont créées pour le projet : elles peuvent être versionnées. Vérifie que .gitignore ne les exclut pas. Documente la commande dans .claude/CLAUDE.md (tableau Commandes) et web/README.md. Pas de commit.
+Ces images sont créées pour le projet : elles peuvent être versionnées. Vérifie que .gitignore ne les exclut pas. Documente la commande dans .claude/CLAUDE.md (tableau Commandes) et web/README.md. Fais un commit en français à la fin de l'étape.
 ```
 
 ## Étape 8 : vue moderne, plateau en lecture seule
@@ -201,7 +201,7 @@ Pour la projection et la caméra, tu peux t'inspirer de D:/VisualCode_Perso/Donj
 
 Crée web/jeu/vue/plateau.js : un rendu isométrique sur un canvas séparé, qui ne fait que lire lireEtat(machine) à chaque image. Il affiche les cases vues, les murs, les portes, les meubles, les héros et les monstres, avec une caméra qui suit le personnage courant. Il charge web/vue/images/atlas.json s'il existe, sinon il dessine des formes simples.
 
-Activation provisoire par ?vue=moderne : le canvas moderne prend la place principale et l'écran d'origine reste visible en petit, jouable comme avant. Sans le paramètre, rien ne change. Vérifie dans le navigateur sur une quête complète : la vue suit fidèlement la partie. Documente-le dans web/README.md. Pas de commit.
+Activation provisoire par ?vue=moderne : le canvas moderne prend la place principale et l'écran d'origine reste visible en petit, jouable comme avant. Sans le paramètre, rien ne change. Vérifie dans le navigateur sur une quête complète : la vue suit fidèlement la partie. Documente-le dans web/README.md. Fais un commit en français à la fin de l'étape.
 ```
 
 ## Étape 9 : vue moderne, bascule et interface
@@ -216,7 +216,7 @@ Lis .claude/CLAUDE.md, web/README.md, web/jeu/vue/ et original/notes/02-ecrans.m
 3. Autour du plateau moderne : fiches des héros (portraits de l'avatar, points de corps et d'esprit), panneau d'actions, journal des messages du jeu, dés du dernier lancer. Pour l'instant tout est en lecture seule : les actions se font encore sur l'écran d'origine en miniature.
 4. Mise en page téléphone en paysage, cohérente avec web/jeu/tactile.js.
 
-Vérifie au navigateur et avec outils/navigateur.mjs. Documente-le dans web/README.md. Pas de commit.
+Vérifie au navigateur et avec outils/navigateur.mjs. Documente-le dans web/README.md. Fais un commit en français à la fin de l'étape.
 ```
 
 ## Étape 10 : vue moderne, commandes
@@ -231,7 +231,7 @@ Rends la vue moderne jouable. Chaque action passe par l'entrée du jeu d'origine
 - clic sur une case du plateau moderne -> conversion en case de la grille, puis clic simulé sur cette case dans la vue d'origine ; si la case n'est pas visible dans la vue d'origine, propose une solution et demande avant de l'implémenter ;
 - clic droit et appui long comme dans tactile.js.
 
-Ajoute à outils/essai.mjs un scénario joué entièrement par la vue moderne (lancer de dés, déplacement, attaque, fin de tour) et compare la mémoire à la fin avec le même scénario joué sur la vue d'origine : elle doit être identique. Documente-le dans web/README.md. Pas de commit.
+Ajoute à outils/essai.mjs un scénario joué entièrement par la vue moderne (lancer de dés, déplacement, attaque, fin de tour) et compare la mémoire à la fin avec le même scénario joué sur la vue d'origine : elle doit être identique. Documente-le dans web/README.md. Fais un commit en français à la fin de l'étape.
 ```
 
 ## Étape 11 : vue moderne, graphismes définitifs
@@ -247,5 +247,5 @@ Lance outils/decouper-planches.py. Branche l'atlas dans la vue moderne :
 - pions des héros en 4 directions, d'après le dernier déplacement ;
 - interface et dés.
 
-Fais une capture de chaque écran de la vue moderne (outils/navigateur.mjs), relis-les, et liste les planches à regénérer avec la raison (découpe ratée, style incohérent, taille). Mets à jour docs/prompts-interface.md si un prompt doit être corrigé. Pas de commit.
+Fais une capture de chaque écran de la vue moderne (outils/navigateur.mjs), relis-les, et liste les planches à regénérer avec la raison (découpe ratée, style incohérent, taille). Mets à jour docs/prompts-interface.md si un prompt doit être corrigé. Fais un commit en français à la fin de l'étape.
 ```
