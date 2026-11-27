@@ -20,7 +20,7 @@ Règles communes, déjà rappelées dans chaque prompt :
 | 0 | Inscrire le plan dans ROADMAP.md | 27 novembre 2026 |
 | 1 | Couche d'état lisible | 27 novembre 2026 |
 | 2 | Inspecteur | 27 novembre 2026 |
-| 3 | Dossier `cours/` et leçon 1 (hasard et dés) | |
+| 3 | Dossier `cours/` et leçon 1 (hasard et dés) | 27 novembre 2026 |
 | 4 | Leçons du code déjà réécrit | |
 | 5 | Boucle : réécrire un sous-système, puis sa leçon | à répéter |
 | 6 | Prompts des graphismes | |

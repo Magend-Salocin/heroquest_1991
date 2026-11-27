@@ -4,7 +4,6 @@
 // Il ne fait que lire la mémoire. Sans ?inspecteur=1, ce module n'est pas chargé.
 
 import { lireEtat, LARGEUR, HAUTEUR } from './etat.js';
-import { Donnees } from '../lisible/donnees.js';
 import { Hasard } from '../lisible/hasard.js';
 import { QUEST } from '../lisible/adresses.gen.js';
 import { RETOUR_LISIBLE } from '../lisible/routines.js';
@@ -221,7 +220,7 @@ export function creerInspecteur(conteneur) {
         return;
       }
       const etat = lireEtat(m);
-      const graine = new Hasard(new Donnees(m)).graine();
+      const graine = etat.graine;
       entete.textContent = `Quête ${etat.quete + 1}, personnage ${etat.personnageCourant} · routine en cours : ${nomRoutine(m, m.ip)} (IP ${hex(m.ip)})`;
 
       pile.replaceChildren();

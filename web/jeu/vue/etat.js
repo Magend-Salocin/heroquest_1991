@@ -6,6 +6,7 @@
 
 import { Donnees, TABLES, Fiche, Monstre } from '../lisible/donnees.js';
 import { MUR, PORTE } from '../lisible/deplacement.js';
+import { Hasard } from '../lisible/hasard.js';
 
 export const LARGEUR = 26;
 export const HAUTEUR = 19;
@@ -136,6 +137,7 @@ export function lireEtat(machine) {
   return {
     quete: d.numeroQuete,
     personnageCourant: d.personnageCourant,
+    graine: new Hasard(d).graine(),          // registre du hasard (DS:38FD), octet a en haut
     plateau: lirePlateau(d),
     heros: lireHeros(d),
     monstres: lireMonstres(d),

@@ -109,6 +109,7 @@ Au 18 novembre 2026 : les 25 routines sont identiques sur 100 cas chacune (secon
 | Champ | Contenu |
 | --- | --- |
 | `quete` | numéro de la quête (0 = la 1re) |
+| `graine` | registre du hasard (DS:38FD, 4 octets, le premier en haut) |
 | `personnageCourant` | personnage qui joue, ou qui a joué en dernier (0 à 4) ; aucune variable identifiée ne dit encore si c'est le tour des monstres |
 | `plateau.cases` | 26 × 19 cases, rangées `y × 26 + x` : `zone`, `vue`, `bordVu`, les 4 bords (`haut`, `gauche`, `bas`, `droite` : `mur`, `porte` avec `ouverte` et `secrete`) et `occupant` |
 | `heros` | fiches présentes : `numero`, `type` et `nomType`, `x`, `y`, `zone`, points de corps et d'esprit, dés d'attaque et de défense, `or` |
