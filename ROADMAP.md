@@ -73,7 +73,7 @@ Reste :
 
 1. Comparer des écrans pixel à pixel avec des captures de DOSBox-X (le contrôle prévu), et rejouer une partie avec la même graine sur les deux.
 2. Son : fait en phase 4 (WAV de l'AdLib).
-3. Réécrire tout le code à la main, lisible (classes et méthodes), pour le manuel technique : commencé le 18 novembre 2026 dans `web/jeu/lisible/` ([méthode](web/README.md#code-lisible)). Fait : le mécanisme par étapes (routines qui attendent le joueur ou l'écran), le hasard, le combat, le déplacement, le tour d'un personnage, puis le 27 novembre 2026 la liste des objets et les règles de l'inventaire, la fouille du trésor, la fouille des portes secrètes et des pièges (45 routines). Reste : l'écran de l'inventaire et les autres sous-systèmes, un par un (ordre : [plan de la phase 5](docs/PLAN-cours-vue-moderne.md#étape-5--réécrire-un-sous-système-puis-sa-leçon-à-répéter)). Bogues de l'original relevés en route : [bogues-reecriture.md](original/notes/bogues-reecriture.md).
+3. Réécrire tout le code à la main, lisible (classes et méthodes), pour le manuel technique : commencé le 18 novembre 2026 dans `web/jeu/lisible/` ([méthode](web/README.md#code-lisible)). Fait : le mécanisme par étapes (routines qui attendent le joueur ou l'écran), le hasard, le combat, le déplacement, le tour d'un personnage, puis le 27 novembre 2026 la liste des objets et les règles de l'inventaire, la fouille du trésor, la fouille des portes secrètes et des pièges, la ligne de vue (51 routines). Reste : l'écran de l'inventaire et les autres sous-systèmes, un par un (ordre : [plan de la phase 5](docs/PLAN-cours-vue-moderne.md#étape-5--réécrire-un-sous-système-puis-sa-leçon-à-répéter)). Bogues de l'original relevés en route : [bogues-reecriture.md](original/notes/bogues-reecriture.md).
 
 ## Phase 4 : PHP et finition
 
@@ -92,7 +92,7 @@ But : se servir du jeu pour enseigner la programmation, et proposer une seconde 
 | 2 | Inspecteur (`?inspecteur=1`) | fait le 27 novembre 2026 |
 | 3 | Dossier `cours/` et leçon 1 (hasard et dés) | fait le 27 novembre 2026 |
 | 4 | Leçons du code déjà réécrit (routines par étapes, combat, déplacement, tour) | fait le 27 novembre 2026 (leçons 2 à 5) |
-| 5 | Réécrire un sous-système, puis sa leçon (à répéter) | en cours : objets de l'inventaire (leçon 6) fouille du trésor (leçon 7), portes secrètes et pièges cherchés (leçon 8) faits le 27 novembre 2026 ; restent l'écran de l'inventaire, les événements de fouille, le déclenchement des pièges, puis les sous-systèmes suivants |
+| 5 | Réécrire un sous-système, puis sa leçon (à répéter) | en cours : objets de l'inventaire (leçon 6) fouille du trésor (leçon 7), portes secrètes et pièges cherchés (leçon 8), ligne de vue (leçon 9) faits le 27 novembre 2026 ; restent l'écran de l'inventaire, les événements de fouille, le déclenchement des pièges, puis les sous-systèmes suivants |
 | 6 | Prompts des graphismes (`docs/prompts-interface.md`) | fait le 27 novembre 2026 ; planches à générer |
 | 7 | Script de découpe des planches | fait le 27 novembre 2026 (`outils/decouper-planches.py`, `outils/planches.json`) |
 | 8 | Vue moderne : plateau en lecture seule | fait le 27 novembre 2026 (`?vue=moderne`, formes simples en attendant les planches) |

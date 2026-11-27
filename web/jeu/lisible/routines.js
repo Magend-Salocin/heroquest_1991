@@ -21,6 +21,7 @@ import { Deplacement } from './deplacement.js';
 import { Tour } from './tour.js';
 import { Inventaire, numeroBit } from './inventaire.js';
 import { Fouilles } from './fouilles.js';
+import { LigneDeVue } from './ligne-de-vue.js';
 import { Fiche } from './donnees.js';
 
 // Adresse de retour réservée : le segment de code de QUEST s'arrête à 0x97C0.
@@ -323,6 +324,38 @@ export const ROUTINES_QUEST = {
     nom: 'fouille_portes', cout: 12, sortie: [], etapes: true,
     executer: ({ fouilles }) => fouilles.fouillerPortes(),
   },
+
+  // ---- Ligne de vue (ligne-de-vue.js)
+  0x607e: {
+    nom: 'index_case', cout: 9, sortie: ['ax', 'bx', 'dx'],
+    // Entrée DL x, DH y. Sortie AX début de la rangée, BX = DX = index de la case.
+    executer({ ligneDeVue }, m) {
+      const index = ligneDeVue.indexCase(m.dx & 0xff, m.dx >> 8);
+      m.bx = m.dx = index;
+    },
+  },
+  0x1287: {
+    nom: 'personnage_en_dx', cout: 45, sortie: ['ax', 'cx', 'di'],
+    // Entrée DL x, DH y. Sortie AX = 1 si un personnage y est, 0 sinon.
+    executer({ deplacement }, m) { m.ax = deplacement.personnageEn(m.dx & 0xff, m.dx >> 8) ? 1 : 0; },
+  },
+  0x1214: {
+    nom: 'case_coupe_vue', cout: 30, sortie: ['ax', 'bx', 'dx'],
+    executer({ ligneDeVue }) { ligneDeVue.caseCoupeVue(); },
+  },
+  0x1148: {
+    nom: 'ligne_de_vue', cout: 120, sortie: ['ax', 'bx', 'cx', 'dx', 'di'],
+    // Entrée BH x, BL y de la case visée.
+    executer({ ligneDeVue }, m) { ligneDeVue.ligneDeVue(m.bx >> 8, m.bx & 0xff); },
+  },
+  0x113e: {
+    nom: 'vue_cible', cout: 125, sortie: ['ax', 'bx', 'cx', 'dx', 'si', 'di'],
+    executer({ ligneDeVue }) { ligneDeVue.vueCible(); },
+  },
+  0x0b1c: {
+    nom: 'tir_ligne_libre', cout: 130, sortie: ['ax', 'bx', 'cx', 'dx', 'si', 'di'],
+    executer({ ligneDeVue }) { ligneDeVue.tirLigneLibre(); },
+  },
 };
 
 // Remplace, dans la table des routines générées, l'entrée de chaque routine réécrite.
@@ -382,5 +415,6 @@ export function creerJeu(machine) {
   jeu.tour = new Tour(jeu);
   jeu.inventaire = new Inventaire(jeu);
   jeu.fouilles = new Fouilles(jeu);
+  jeu.ligneDeVue = new LigneDeVue(jeu);
   return jeu;
 }

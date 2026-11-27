@@ -52,6 +52,33 @@ const semerPortesEtPieges = (cas) => {
     if (lireOctetDS(cas, 0x546f + index) & 0x3f) octetDS(cas, 0x586f + index, [0x32, 0x34, 0x36][alea(3)]);
   }
 };
+// Ligne de vue : position du héros courant, cases autour, case visée, obstacles.
+const heroCoord = (cas) => {
+  const fiche = lireOctetDS(cas, 0x4637) | (lireOctetDS(cas, 0x4638) << 8);
+  return [lireOctetDS(cas, fiche + 1), lireOctetDS(cas, fiche + 2)];
+};
+const autourDuHeros = (cas) => {
+  const [hx, hy] = heroCoord(cas);
+  const borne = (v, max) => Math.max(0, Math.min(max - 1, v));
+  return [borne(hx - 6 + alea(13), 26), borne(hy - 6 + alea(13), 19)];
+};
+const caseVisee = (cas) => {
+  const [hx, hy] = heroCoord(cas);
+  const [x, y] = alea(3) === 0 ? [hx, hy + (alea(2) ? 3 : -3)] : alea(3) === 0 ? [hx - 3, hy - 3] : autourDuHeros(cas);
+  return ((x & 0xff) << 8) | (y & 0xff);
+};
+const placerCibleVisee = (cas) => {
+  const cible = lireOctetDS(cas, 0x3fd4) | (lireOctetDS(cas, 0x3fd5) << 8);
+  const visee = caseVisee(cas);
+  octetDS(cas, cible + 1, visee >> 8);
+  octetDS(cas, cible + 2, visee & 0xff);
+};
+const semerObstacles = (cas) => {
+  for (let n = 0; n < 12; n++) {
+    const [x, y] = autourDuHeros(cas);
+    octetDS(cas, 0x586f + y * 26 + x, [0x4b, 0x54, 0x57, 0x5c, 2 + alea(30), 0x31, 0x33][alea(7)]);
+  }
+};
 // Pioche des trésors : les 25 cartes mélangées, puis FFh ; carte_tresor (DS:4655) sur le FFh.
 // Une fois sur quatre, des cartes sont déjà sorties du jeu ; celles qui sont toujours remises sous
 // la pioche (or, arbalète, monstres) restent : sans carte d'or, une pioche de monstres errants
@@ -136,6 +163,20 @@ const ENTREES = {
     if (alea(2)) octetDS(cas, cas.etat.bx + 0x400, [0x32, 0x34, 0x36][alea(3)]);
   },
   ouvre_porte_secrete: (cas) => { cas.etat.bx = 0x566f + alea(494); },
+  // Ligne de vue : une case visée près du héros (souvent dans l'axe ou en diagonale), des meubles
+  // et des personnages semés autour.
+  ligne_de_vue: (cas) => { semerObstacles(cas); cas.etat.bx = caseVisee(cas); },
+  vue_cible: (cas) => { semerObstacles(cas); placerCibleVisee(cas); },
+  tir_ligne_libre: (cas) => { semerObstacles(cas); placerCibleVisee(cas); },
+  case_coupe_vue: (cas) => {
+    semerObstacles(cas);
+    const [x, y] = autourDuHeros(cas);
+    octetDS(cas, 0x3fa5, x); octetDS(cas, 0x3fa6, y);
+    octetDS(cas, 0x37e9, alea(2)); octetDS(cas, 0x37ea, 0);
+    octetDS(cas, 0x37eb, alea(4));
+  },
+  index_case: (cas) => { cas.etat.dx = (alea(19) << 8) | alea(26); },
+  personnage_en_dx: (cas) => { cas.etat.dx = (alea(2) ? heroCoord(cas) : [alea(26), alea(19)]).reduce((x, y) => (y << 8) | x); },
   tire_carte: (cas) => melangerPioche(cas),
   remet_carte: (cas) => { melangerPioche(cas); cas.etat.ax = alea(25); },
   monstre_actif_case: (cas) => {

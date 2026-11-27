@@ -56,3 +56,9 @@ Comportements du code de 1991 trouvés en réécrivant les routines dans `web/je
 | `fouille_case` | Porte d'une voisine trouvée : la zone de l'autre côté est passée à `marque_zone_vue` sans masque (`and al, 3Fh` absent), avec les bits « case vue » (40h, 80h). Pour la porte du bord de la case, le masque est fait. | |
 | `fouille_portes` (0x6DFA) | Le test « déjà fouillée » du début lit `zone_heros` avant que `cherche_portes_pieges` la recalcule : c'est la zone du dernier calcul, pas forcément celle du héros. | |
 | `fouille_portes` | Le piège trouvé est noté dans `position_tuile_carte` (DS:37EB), une variable du dessin de la carte, jamais remise à 0 avant la recherche : s'il vaut encore 1, la fouille sort sans message ni marque, même sans rien trouver. | |
+
+## Ligne de vue
+
+| Routine | Constat | Note à revoir |
+| --- | --- | --- |
+| `ligne_de_vue` (0x1148), axe principal x | L'écart en x est rangé dans CL, qui sert aussi de compteur à `loop` : l'erreur cumulée est comparée aux cases restantes au lieu de l'écart en x. Le seuil baisse à chaque pas : le tracé change de rangée de plus en plus souvent et n'arrive pas sur la cible. De (13, 14) vers (9, 12), le jeu teste (12, 14), (11, 13), (10, 12) et finit en (9, 11), au lieu de (12, 14), (11, 13), (10, 13), (9, 12) ; de (10, 0) vers (0, 3), il finit en (0, 6). La vue est donc vérifiée le long d'une autre ligne que celle qui mène à la cible. Sur l'axe y, les deux sont dans des registres différents (CL et CH) : le tracé est juste. | 03-regles.md, « Ligne de vue » : « une ligne de type Bresenham » |
