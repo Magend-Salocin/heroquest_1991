@@ -14,6 +14,7 @@ const TAILLE_FICHE = 26;
 const TAILLE_MONSTRE = 10;
 const NOMBRE_FICHES = 5;
 const NOMBRE_MONSTRES = 32;
+const SEGMENT_DONNEES = 0x97c;   // DS de QUEST.EXE dans l'image, avant relogement
 
 export const TYPES_HEROS = ['barbare', 'nain', 'elfe', 'enchanteur', 'Sir Ragnar'];
 export const TYPES_MONSTRES = ['gobelin', 'orc', 'fimir', 'guerrier du chaos', 'squelette', 'zombi', 'momie',
@@ -132,8 +133,10 @@ function lireMonstres(d) {
 
 // Phase du tour : la mémoire ne dit pas si c'est le tour des héros ou des monstres (aucune variable
 // identifiée pour l'instant) ; seul le personnage qui joue ou a joué en dernier est connu.
+// La lecture se fait toujours dans le segment de données du jeu : le code d'origine change DS
+// par moments (décompression, copies d'images), et l'image peut tomber à ce moment-là.
 export function lireEtat(machine) {
-  const d = new Donnees(machine);
+  const d = new Donnees(Object.create(machine, { ds: { value: machine.L + SEGMENT_DONNEES } }));
   return {
     quete: d.numeroQuete,
     personnageCourant: d.personnageCourant,

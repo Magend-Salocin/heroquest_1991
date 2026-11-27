@@ -15,6 +15,7 @@
 //   index.html?importer     propose d'importer un autre paquet
 //   index.html?tactile, ?sans-tactile   force ou masque les commandes tactiles
 //   index.html?inspecteur   panneau qui montre la partie telle que le code la voit (vue/inspecteur.js)
+//   index.html?vue=moderne  plateau dessiné en isométrique (vue/plateau.js), l'écran d'origine en petit
 
 import { Machine, INSTRUCTIONS_PAR_MS } from './machine.js';
 import { codeClavier, asciiDe } from './clavier.js';
@@ -52,6 +53,7 @@ const image = contexte.createImageData(320, 200);
 let machine = null;                                  // programme en cours, pour les entrées
 let programme = null;
 let inspecteur = null;                               // ?inspecteur : vue/inspecteur.js
+let vueModerne = null;                               // ?vue=moderne : vue/plateau.js
 
 // ---- Sources des données
 
@@ -271,6 +273,7 @@ async function executer(nom, donnees, son) {
       }
       afficher(m);
       if (inspecteur) inspecteur.mettreAJour(m, nom);
+      if (vueModerne) vueModerne.mettreAJour(m, nom);
       if (OPTIONS.has('debug')) etat.textContent = `${nom} t = ${(m.t / INSTRUCTIONS_PAR_MS / 1000).toFixed(1)} s, IP ${m.ip.toString(16)}`;
       if (m.arret !== null) fini(m.arret);
       else requestAnimationFrame(image_suivante);
@@ -322,6 +325,10 @@ async function demarrer() {
   if (OPTIONS.has('inspecteur')) {
     const { creerInspecteur } = await import('./vue/inspecteur.js');
     inspecteur = creerInspecteur(document.querySelector('main'));
+  }
+  if (OPTIONS.get('vue') === 'moderne') {
+    const { creerVueModerne } = await import('./vue/plateau.js');
+    vueModerne = creerVueModerne(document.querySelector('main'));
   }
   etat.textContent = '';
 

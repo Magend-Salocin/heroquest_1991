@@ -25,7 +25,7 @@ Règles communes, déjà rappelées dans chaque prompt :
 | 5 | Boucle : réécrire un sous-système, puis sa leçon | à répéter ; 1 (objets) commencé le 27 novembre 2026 : règles faites, écran de l'inventaire à faire |
 | 6 | Prompts des graphismes | 27 novembre 2026 |
 | 7 | Script de découpe des planches | 27 novembre 2026 |
-| 8 | Vue moderne : plateau en lecture seule | |
+| 8 | Vue moderne : plateau en lecture seule | 27 novembre 2026 |
 | 9 | Vue moderne : bascule et interface | |
 | 10 | Vue moderne : commandes | |
 | 11 | Vue moderne : graphismes définitifs | |

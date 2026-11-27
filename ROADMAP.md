@@ -95,7 +95,7 @@ But : se servir du jeu pour enseigner la programmation, et proposer une seconde 
 | 5 | Réécrire un sous-système, puis sa leçon (à répéter) | en cours : objets de l'inventaire et leçon 6 faits le 27 novembre 2026 ; reste l'écran de l'inventaire, puis les sous-systèmes suivants |
 | 6 | Prompts des graphismes (`docs/prompts-interface.md`) | fait le 27 novembre 2026 ; planches à générer |
 | 7 | Script de découpe des planches | fait le 27 novembre 2026 (`outils/decouper-planches.py`, `outils/planches.json`) |
-| 8 | Vue moderne : plateau en lecture seule | à faire |
+| 8 | Vue moderne : plateau en lecture seule | fait le 27 novembre 2026 (`?vue=moderne`, formes simples en attendant les planches) |
 | 9 | Vue moderne : bascule et interface | à faire |
 | 10 | Vue moderne : commandes | à faire |
 | 11 | Vue moderne : graphismes définitifs | à faire |

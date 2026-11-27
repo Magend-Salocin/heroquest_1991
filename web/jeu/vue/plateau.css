@@ -1,0 +1,12 @@
+/* Vue moderne (vue/plateau.js). Hors du plateau, l'écran d'origine garde sa place. Sur le plateau,
+   la vue moderne prend la place principale et l'écran d'origine passe en petit, en haut à droite,
+   toujours jouable. */
+#vue-moderne { display: none; }
+body.vue-moderne.plateau-actif main { position: relative; width: min(96vw, 160vh); }
+body.vue-moderne.plateau-actif #vue-moderne {
+  display: block; width: 100%; aspect-ratio: 16 / 10; background: #0b0d12; border-radius: 6px;
+}
+body.vue-moderne.plateau-actif #ecran {
+  position: absolute; top: 8px; right: 8px; width: min(32vw, 400px); z-index: 1;
+  border: 1px solid #555; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}

@@ -21,6 +21,7 @@ Un seul affichage, le VGA, et un seul son, l'AdLib. La page fournit `QUEST.CFG` 
 | `index.html?paquet`, `?paquet=URL`, `?importer` | ignore le serveur PHP et utilise le paquet de l'appareil ; l'importe depuis une adresse ; propose d'en importer un autre |
 | `index.html?tactile`, `?sans-tactile` | force ou masque les commandes tactiles (affichées d'office sur un écran tactile) |
 | `index.html?inspecteur` | panneau qui montre la partie telle que le code la voit (voir « Inspecteur ») |
+| `index.html?vue=moderne` | plateau dessiné en isométrique, l'écran d'origine en petit (voir « Vue moderne ») |
 
 Le jeu dessine son propre curseur. Clavier : positions physiques du PC (voir `jeu/clavier.js`) ; Ctrl quitte.
 
@@ -108,6 +109,8 @@ Au 27 novembre 2026 : les 6 routines de l'inventaire sont identiques sur 100 cas
 
 `jeu/vue/etat.js` lit la partie en cours dans la mémoire du jeu et la rend sous forme d'objet JavaScript simple, sans référence à la mémoire et sans rien y écrire. C'est la base de l'inspecteur et de la vue moderne (phase 5 de la [roadmap](../ROADMAP.md)). Toutes les lectures passent par `jeu/lisible/donnees.js`.
 
+La lecture se fait dans le segment de données du jeu (`machine.L + 0x97C`), pas avec le DS du moment : le code d'origine change DS par moments (décompression, copies d'images), et une image du navigateur peut tomber à cet instant.
+
 `lireEtat(machine)` renvoie :
 
 | Champ | Contenu |
@@ -140,6 +143,16 @@ ETAT=etat.json node essai.mjs 5 plateau.png "clic:68:128,attendre:3,clic:160:44,
 | Plateau | les trois grilles (zones, murs et portes, occupants), une case par 8 px ; le survol d'une case la détaille |
 
 `machine.js` garde le fond de la pile au chargement (`spDepart`) pour que la lecture de la pile s'y arrête.
+
+## Vue moderne
+
+`index.html?vue=moderne` charge `jeu/vue/plateau.js` : sur le plateau, un canvas dessine la partie en isométrique (cases de 64 × 32), et l'écran d'origine passe en petit en haut à droite, toujours jouable : pour l'instant, on joue sur lui. La vue moderne ne fait que lire `lireEtat` à chaque image ; les règles et les dés restent ceux du code d'origine (décision D6 de la roadmap).
+
+- Seuls les murs du fond (bords haut et gauche de chaque case) sont dessinés ; une case dont seul le bord est connu n'a qu'un muret.
+- On ne montre que ce que les héros ont vu : cases vues, monstres vus et vivants, pièges trouvés, portes secrètes ouvertes (une porte secrète cachée est dessinée comme un mur).
+- La caméra suit le personnage courant.
+- Images de l'atlas (`vue/images/atlas.json`) quand il existe ; sinon, ou pour une image absente, des formes simples (losanges, pans de mur, blocs, figurines).
+- Hors du plateau (pas de case vue), l'écran d'origine reprend sa place.
 
 ## Graphismes de la vue moderne
 
