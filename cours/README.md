@@ -27,6 +27,10 @@ Les exercices se font dans une copie de travail (une branche git). Après une mo
 | N° | Leçon | Notions |
 | --- | --- | --- |
 | 1 | [Le hasard et les dés](01-hasard-et-des.md) | générateur pseudo-aléatoire, graine, registre à décalage, modulo et biais, opérations sur les bits |
+| 2 | [Des routines qui attendent](02-routines-par-etapes.md) | fonctions génératrices, machine à états, pile d'appels, boucle d'attente (polling) |
+| 3 | [Le combat](03-combat.md) | champs de bits, règles rangées dans des tables, probabilités |
+| 4 | [Le déplacement](04-deplacement.md) | grilles en tableau à une dimension, murs sans doublon, recherche en profondeur avec coupes, parcours en largeur |
+| 5 | [Le tour de jeu](05-tour.md) | boucle de jeu, tampon hors écran, zones cliquables pilotées par une table |
 
 Toutes les leçons suivent le même plan : [GABARIT.md](GABARIT.md).
 

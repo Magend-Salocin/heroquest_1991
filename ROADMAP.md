@@ -91,7 +91,7 @@ But : se servir du jeu pour enseigner la programmation, et proposer une seconde 
 | 1 | Couche d'état lisible (`web/jeu/vue/etat.js`) | faite le 27 novembre 2026 ; reste à identifier la variable qui distingue le tour des héros de celui des monstres |
 | 2 | Inspecteur (`?inspecteur=1`) | fait le 27 novembre 2026 |
 | 3 | Dossier `cours/` et leçon 1 (hasard et dés) | fait le 27 novembre 2026 |
-| 4 | Leçons du code déjà réécrit (routines par étapes, combat, déplacement, tour) | à faire |
+| 4 | Leçons du code déjà réécrit (routines par étapes, combat, déplacement, tour) | fait le 27 novembre 2026 (leçons 2 à 5) |
 | 5 | Réécrire un sous-système, puis sa leçon (à répéter) | à faire |
 | 6 | Prompts des graphismes (`docs/prompts-interface.md`) | à faire |
 | 7 | Script de découpe des planches | à faire |
